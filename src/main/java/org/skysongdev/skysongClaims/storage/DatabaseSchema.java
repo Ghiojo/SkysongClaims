@@ -1,10 +1,10 @@
 package org.skysongdev.skysongClaims.storage;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  * Creates the plugin's tables if they don't exist yet. Every child row is deleted with its
@@ -16,8 +16,8 @@ public final class DatabaseSchema {
                     + "id VARCHAR(32) PRIMARY KEY NOT NULL, "
                     + "display_name VARCHAR(255) NOT NULL, "
                     + "type_id VARCHAR(32) NOT NULL, "
-                    + "free BOOLEAN NOT NULL, "
-                    + "max_owners INT NOT NULL, "
+                    // NULL for a bought Claim, which has no cap on owners.
+                    + "slots INT NULL, "
                     + "for_sale_by VARCHAR(64) NULL) ENGINE=InnoDB",
             // A WorldGuard region belongs to one Claim at most, so (world, region_id) is the key.
             "CREATE TABLE IF NOT EXISTS claim_regions ("

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -23,8 +24,8 @@ import java.util.regex.Pattern;
  * @param id          the name staff type, lower case, up to 32 characters
  * @param displayName the name shown to players, in MiniMessage
  * @param typeId      the id of its type in {@code types.yml}
- * @param free        whether players take it themselves, one slot each
- * @param maxOwners   how many owners it has room for
+ * @param slots       how many owners a Free Claim has room for, each taking one slot themselves;
+ *                    empty for a bought Claim, which has no cap on owners
  * @param regions     its WorldGuard regions, at least one, in the order they were added
  * @param owners      its owners, in the order they joined
  * @param groups      its owners' groups, in the order they were made
@@ -35,8 +36,7 @@ public record Claim(
         String id,
         String displayName,
         String typeId,
-        boolean free,
-        int maxOwners,
+        OptionalInt slots,
         List<ClaimRegion> regions,
         List<ClaimOwner> owners,
         List<ClaimGroup> groups,
@@ -49,12 +49,13 @@ public record Claim(
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(displayName, "displayName");
         Objects.requireNonNull(typeId, "typeId");
+        Objects.requireNonNull(slots, "slots");
         Objects.requireNonNull(saleSetBy, "saleSetBy");
         if (!isValidId(id)) {
             throw new IllegalArgumentException("Invalid claim id: " + id);
         }
-        if (maxOwners < 1) {
-            throw new IllegalArgumentException("maxOwners must be at least 1: " + maxOwners);
+        if (slots.isPresent() && slots.getAsInt() < 1) {
+            throw new IllegalArgumentException("A Free Claim needs at least one slot: " + slots.getAsInt());
         }
         regions = List.copyOf(new LinkedHashSet<>(regions));
         if (regions.isEmpty()) {
@@ -65,9 +66,14 @@ public record Claim(
         flags = Collections.unmodifiableMap(new TreeMap<>(flags));
     }
 
-    /** @return a new, unowned Claim with no groups that isn't for sale */
-    public static Claim create(String id, String typeId, boolean free, int maxOwners, List<ClaimRegion> regions) {
-        return new Claim(id, id, typeId, free, maxOwners, regions, List.of(), List.of(), Optional.empty(), Map.of());
+    /** @return a new, unowned Claim with no groups that isn't for sale; a Free Claim when it has slots */
+    public static Claim create(String id, String typeId, OptionalInt slots, List<ClaimRegion> regions) {
+        return new Claim(id, id, typeId, slots, regions, List.of(), List.of(), Optional.empty(), Map.of());
+    }
+
+    /** @return whether players take it themselves, one slot each */
+    public boolean free() {
+        return slots.isPresent();
     }
 
     /** @return whether {@code id} can name a Claim: 1 to 32 lower case letters, digits, '_' or '-' */
@@ -87,14 +93,19 @@ public record Claim(
         return saleSetBy.isPresent();
     }
 
-    /** @return how many more owners it has room for, never negative */
-    public int openSlots() {
-        return Math.max(0, maxOwners - owners.size());
+    /** @return how many slots of a Free Claim are open, never negative; empty for a bought Claim */
+    public OptionalInt openSlots() {
+        return slots.isPresent() ? OptionalInt.of(Math.max(0, slots.getAsInt() - owners.size())) : OptionalInt.empty();
+    }
+
+    /** @return whether one more owner fits: always for a bought Claim, while a slot is open for a Free Claim */
+    public boolean hasRoom() {
+        return slots.isEmpty() || owners.size() < slots.getAsInt();
     }
 
     /** @return what the API shows of it: everything but its groups and flags */
     public ClaimInfo info() {
-        return new ClaimInfo(id, displayName, typeId, free, maxOwners, regions, owners, saleSetBy);
+        return new ClaimInfo(id, displayName, typeId, slots, regions, owners, saleSetBy);
     }
 
     public Optional<ClaimGroup> group(String groupId) {
@@ -120,34 +131,35 @@ public record Claim(
     }
 
     public Claim withDisplayName(String newDisplayName) {
-        return new Claim(id, newDisplayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy, flags);
+        return new Claim(id, newDisplayName, typeId, slots, regions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withType(String newTypeId) {
-        return new Claim(id, displayName, newTypeId, free, maxOwners, regions, owners, groups, saleSetBy, flags);
+        return new Claim(id, displayName, newTypeId, slots, regions, owners, groups, saleSetBy, flags);
     }
 
-    public Claim withFree(boolean newFree, int newMaxOwners) {
-        return new Claim(id, displayName, typeId, newFree, newMaxOwners, regions, owners, groups, saleSetBy, flags);
+    /** @param newSlots the slots of a Free Claim, or empty to make it a bought Claim */
+    public Claim withSlots(OptionalInt newSlots) {
+        return new Claim(id, displayName, typeId, newSlots, regions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withRegions(List<ClaimRegion> newRegions) {
-        return new Claim(id, displayName, typeId, free, maxOwners, newRegions, owners, groups, saleSetBy, flags);
+        return new Claim(id, displayName, typeId, slots, newRegions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withOwners(List<ClaimOwner> newOwners) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, newOwners, groups, saleSetBy, flags);
+        return new Claim(id, displayName, typeId, slots, regions, newOwners, groups, saleSetBy, flags);
     }
 
     public Claim withGroups(List<ClaimGroup> newGroups) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, newGroups, saleSetBy, flags);
+        return new Claim(id, displayName, typeId, slots, regions, owners, newGroups, saleSetBy, flags);
     }
 
     public Claim withFlags(Map<String, String> newFlags) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy, newFlags);
+        return new Claim(id, displayName, typeId, slots, regions, owners, groups, saleSetBy, newFlags);
     }
 
     public Claim withSale(Optional<String> newSaleSetBy) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, groups, newSaleSetBy, flags);
+        return new Claim(id, displayName, typeId, slots, regions, owners, groups, newSaleSetBy, flags);
     }
 }

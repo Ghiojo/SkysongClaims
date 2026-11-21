@@ -17,8 +17,8 @@ import java.util.OptionalInt;
  * @param displayName      the name shown to players, in MiniMessage
  * @param limit            how many Claims of this type one subject may own before bonuses
  * @param limitScope       whether {@link #limit} counts per character or per account
- * @param maxOwners        how many owners a new Claim of this type has room for
- * @param freeClaim        whether a new Claim of this type starts as a Free Claim that players take themselves
+ * @param freeClaimSlots   the slots of a new Claim of this type, which is a Free Claim that players
+ *                         take themselves; empty when its Claims are bought, with no cap on owners
  * @param openUse          the WorldGuard flags set to {@code allow} on every region of its Claims
  * @param extra            settings for other plugins, as plain unmodifiable maps, lists and values
  */
@@ -27,8 +27,7 @@ public record ClaimType(
         String displayName,
         int limit,
         LimitScope limitScope,
-        int maxOwners,
-        boolean freeClaim,
+        OptionalInt freeClaimSlots,
         List<String> openUse,
         Map<String, Object> extra) {
 
@@ -39,8 +38,9 @@ public record ClaimType(
         if (limit < 0) {
             throw new IllegalArgumentException("limit must not be negative: " + limit);
         }
-        if (maxOwners < 1) {
-            throw new IllegalArgumentException("maxOwners must be at least 1: " + maxOwners);
+        Objects.requireNonNull(freeClaimSlots, "freeClaimSlots");
+        if (freeClaimSlots.isPresent() && freeClaimSlots.getAsInt() < 1) {
+            throw new IllegalArgumentException("A Free Claim type needs at least one slot: " + freeClaimSlots.getAsInt());
         }
         openUse = List.copyOf(openUse);
         extra = Map.copyOf(extra);
@@ -48,11 +48,11 @@ public record ClaimType(
 
     /** @return what the API shows of it: everything but its open-use flags */
     public ClaimTypeInfo info() {
-        return new ClaimTypeInfo(id, displayName, limit, limitScope, maxOwners, freeClaim, extra);
+        return new ClaimTypeInfo(id, displayName, limit, limitScope, freeClaimSlots, extra);
     }
 
-    /** @return the number of owners a new Free Claim of this type has room for, empty when it isn't a Free Claim type */
-    public OptionalInt freeClaimSlots() {
-        return freeClaim ? OptionalInt.of(maxOwners) : OptionalInt.empty();
+    /** @return whether a new Claim of this type is a Free Claim */
+    public boolean freeClaim() {
+        return freeClaimSlots.isPresent();
     }
 }

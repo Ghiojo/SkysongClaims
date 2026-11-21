@@ -22,7 +22,6 @@ public final class StaffCommand extends CommandGroup {
         register(new RemoveRegion(support));
         register(new SetType(support));
         register(new SetFree(support));
-        register(new SetMaxOwners(support));
         register(new RenameClaim(support));
         register(new AddOwner(support, ownership));
         register(new RemoveOwner(support, ownership));

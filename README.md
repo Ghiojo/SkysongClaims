@@ -57,7 +57,8 @@ A sale, for example:
 SkysongClaimsApi claims = SkysongClaimsApi.get();
 OwnershipCheck check = claims.ownership().canOwn(buyer, "rose_house");
 if (check != OwnershipCheck.OK) {
-    // Tell the player why: TYPE_LIMIT, FULL, ALREADY_OWNER or UNKNOWN_CHARACTER.
+    // Tell the player why: TYPE_LIMIT, ALREADY_OWNER, UNKNOWN_CHARACTER, or FULL (Free Claims only;
+    // bought Claims have no cap on owners).
     return;
 }
 // Take the money, then:

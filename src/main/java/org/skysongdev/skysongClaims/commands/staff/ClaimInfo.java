@@ -34,8 +34,8 @@ final class ClaimInfo extends LeafCommand {
                 unparsed("type", claim.typeId()), parsed("type_name", typeName));
         messenger.send(sender, claim.free() ? "claims.info.free" : "claims.info.bought",
                 unparsed("owners", Integer.toString(claim.owners().size())),
-                unparsed("slots", Integer.toString(claim.maxOwners())),
-                unparsed("open", Integer.toString(claim.openSlots())));
+                unparsed("slots", Integer.toString(claim.slots().orElse(0))),
+                unparsed("open", Integer.toString(claim.openSlots().orElse(0))));
         messenger.send(sender, "claims.info.regions", unparsed("regions",
                 claim.regions().stream().map(ClaimRegion::toString).collect(Collectors.joining(", "))));
         messenger.send(sender, claim.isOwned() ? "claims.info.owners" : "claims.info.no-owners",

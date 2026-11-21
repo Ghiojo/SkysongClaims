@@ -22,6 +22,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,7 +45,7 @@ class FlagServiceTest {
         store.observe(new WorldGuardSync(state, regions, new AccessProjection(new FakeCharacters(), TestTypes::registry),
                 warning -> {
                 }));
-        store.save(Claim.create("house", "other", false, 1,
+        store.save(Claim.create("house", "other", OptionalInt.empty(),
                         List.of(new ClaimRegion("world", "house"), new ClaimRegion("world", "garden")))
                 .withOwners(List.of(new ClaimOwner(ALICE, Instant.EPOCH, OwnerCause.STAFF))), ChangeCause.COMMAND);
     }

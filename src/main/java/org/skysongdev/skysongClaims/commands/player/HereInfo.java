@@ -30,8 +30,9 @@ final class HereInfo extends LeafCommand {
                 unparsed("owners", claim.owners().stream().map(ClaimOwner::character).map(ClaimArguments::describe)
                         .collect(Collectors.joining(", "))));
         if (claim.free()) {
-            messenger.send(sender, claim.openSlots() > 0 ? "player.info.free-open" : "player.info.free-full",
-                    unparsed("open", Integer.toString(claim.openSlots())), unparsed("slots", Integer.toString(claim.maxOwners())));
+            messenger.send(sender, claim.hasRoom() ? "player.info.free-open" : "player.info.free-full",
+                    unparsed("open", Integer.toString(claim.openSlots().orElseThrow())),
+                    unparsed("slots", Integer.toString(claim.slots().orElseThrow())));
         } else if (claim.isForSale()) {
             messenger.send(sender, "player.info.for-sale");
         }

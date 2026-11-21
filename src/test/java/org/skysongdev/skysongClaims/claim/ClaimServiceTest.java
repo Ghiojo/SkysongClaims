@@ -54,7 +54,7 @@ class ClaimServiceTest {
         Claim hovel = service.create("hovel_1", "hovel", List.of(HOVEL_1, CELLAR), ChangeCause.COMMAND);
 
         assertTrue(hovel.free());
-        assertEquals(2, hovel.maxOwners());
+        assertEquals(OptionalInt.of(2), hovel.slots());
         assertFalse(hovel.isOwned());
         assertEquals(List.of(HOVEL_1, CELLAR), hovel.regions());
         assertEquals(List.of(hovel), repository.loadAll());
@@ -63,7 +63,7 @@ class ClaimServiceTest {
 
         Claim house = service.create("house", "other", List.of(HOVEL_2), ChangeCause.COMMAND);
         assertFalse(house.free());
-        assertEquals(1, house.maxOwners());
+        assertTrue(house.slots().isEmpty(), "a bought Claim has no cap on owners");
     }
 
     @Test
@@ -115,17 +115,29 @@ class ClaimServiceTest {
     }
 
     @Test
-    void freeClaimSettingsChange() {
+    void aBoughtClaimBecomesFreeWithTheSlotsGiven() {
         service.create("a", "other", List.of(HOVEL_1), ChangeCause.COMMAND);
 
-        Claim free = service.setFree("a", true, OptionalInt.of(3), ChangeCause.COMMAND);
+        refusal("claim.slots-needed", () -> service.makeFree("a", OptionalInt.empty(), ChangeCause.COMMAND));
+        refusal("claim.slots-too-low", () -> service.makeFree("a", OptionalInt.of(0), ChangeCause.COMMAND));
+        Claim free = service.makeFree("a", OptionalInt.of(3), ChangeCause.COMMAND);
         assertTrue(free.free());
-        assertEquals(3, free.maxOwners());
+        assertEquals(OptionalInt.of(3), free.slots());
 
-        Claim bought = service.setFree("a", false, OptionalInt.empty(), ChangeCause.COMMAND);
+        Claim bought = service.makeBought("a", ChangeCause.COMMAND);
         assertFalse(bought.free());
-        assertEquals(3, bought.maxOwners(), "slots stay when none are given");
-        refusal("claim.max-owners-too-low", () -> service.setFree("a", true, OptionalInt.of(0), ChangeCause.COMMAND));
+        assertTrue(bought.hasRoom());
+    }
+
+    @Test
+    void aClaimOfAFreeTypeBecomesFreeWithTheTypesSlots() {
+        service.create("a", "hovel", List.of(HOVEL_1), ChangeCause.COMMAND);
+        service.makeBought("a", ChangeCause.COMMAND);
+
+        assertEquals(OptionalInt.of(2), service.makeFree("a", OptionalInt.empty(), ChangeCause.COMMAND).slots());
+        assertEquals(OptionalInt.of(4), service.makeFree("a", OptionalInt.of(4), ChangeCause.COMMAND).slots());
+        assertEquals(OptionalInt.of(4), service.makeFree("a", OptionalInt.empty(), ChangeCause.COMMAND).slots(),
+                "a Free Claim keeps its own slots");
     }
 
     @Test
@@ -135,8 +147,8 @@ class ClaimServiceTest {
                 new ClaimOwner(new CharacterId(UUID.randomUUID(), "A"), Instant.EPOCH, OwnerCause.STAFF),
                 new ClaimOwner(new CharacterId(UUID.randomUUID(), "B"), Instant.EPOCH, OwnerCause.STAFF))), ChangeCause.COMMAND);
 
-        refusal("claim.max-owners-below-owners", () -> service.setMaxOwners("a", 1, ChangeCause.COMMAND));
-        assertEquals(5, service.setMaxOwners("a", 5, ChangeCause.COMMAND).maxOwners());
+        refusal("claim.slots-below-owners", () -> service.makeFree("a", OptionalInt.of(1), ChangeCause.COMMAND));
+        assertEquals(OptionalInt.of(5), service.makeFree("a", OptionalInt.of(5), ChangeCause.COMMAND).slots());
     }
 
     @Test

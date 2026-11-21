@@ -5,8 +5,8 @@
 #                 other plugins can raise it for some players through the API
 #   limit-per     character or account; config.yml's limit-per when left out
 #   free-claim    makes new Claims of this type Free Claims that players take themselves,
-#                 with default-max-owners slots
-#   max-owners    for other types: how many owners a new Claim has room for (1 when left out)
+#                 with default-max-owners slots. Claims of other types are bought or given by
+#                 staff, and their owners may invite as many co-owners as they like.
 #   open-use      WorldGuard flags set to allow for everyone in the Claim's regions; when left
 #                 out: use, chest-access, interact, sleep, use-anvil, use-dripleaf,
 #                 respawn-anchors, ride, vehicle-place, vehicle-destroy, item-frame-rotation

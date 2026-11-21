@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ class SqlClaimRepositoryTest {
     }
 
     private static Claim fullClaim() {
-        return Claim.create("hovel_1", "hovel", true, 3,
+        return Claim.create("hovel_1", "hovel", OptionalInt.of(3),
                         List.of(new ClaimRegion("world", "hovel_1"), new ClaimRegion("world_nether", "cellar")))
                 .withDisplayName("<gold>Hovel One")
                 .withOwners(List.of(
@@ -81,7 +82,7 @@ class SqlClaimRepositoryTest {
     @Test
     void deleteRemovesTheClaimAndItsRows() {
         repository.save(fullClaim());
-        Claim other = Claim.create("other_1", "other", false, 1, List.of(new ClaimRegion("world", "hovel_1")));
+        Claim other = Claim.create("other_1", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "hovel_1")));
 
         repository.delete("hovel_1");
         repository.save(other); // the region is free again
@@ -94,7 +95,7 @@ class SqlClaimRepositoryTest {
         repository.save(fullClaim());
 
         assertThrows(StorageException.class, () -> repository.save(
-                Claim.create("thief", "other", false, 1, List.of(new ClaimRegion("world", "hovel_1")))));
+                Claim.create("thief", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "hovel_1")))));
         assertEquals(1, repository.loadAll().size());
     }
 

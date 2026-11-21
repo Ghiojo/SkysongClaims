@@ -2,6 +2,7 @@ package org.skysongdev.skysongClaims.ownership;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
 import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
@@ -18,8 +19,10 @@ import org.skysongdev.skysongClaims.support.TestTypes;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,8 +44,8 @@ class InviteServiceTest {
     void setUp() {
         alice = characters.play(UUID.randomUUID(), "Alice");
         bob = characters.play(UUID.randomUUID(), "Bob");
-        store.save(Claim.create("house", "other", false, 2, List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
-        store.save(Claim.create("shop", "other", false, 2, List.of(new ClaimRegion("world", "shop"))), ChangeCause.COMMAND);
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
+        store.save(Claim.create("shop", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "shop"))), ChangeCause.COMMAND);
         ownership.addOwner("house", alice, OwnerCause.STAFF, ChangeCause.COMMAND, false);
         ownership.addOwner("shop", alice, OwnerCause.STAFF, ChangeCause.COMMAND, false);
     }
@@ -93,11 +96,25 @@ class InviteServiceTest {
 
     @Test
     void acceptingChecksAgain() {
-        invites.invite(alice, "house", bob);
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_1")))
+                .withOwners(List.of(new ClaimOwner(alice, Instant.EPOCH, OwnerCause.FREE_CLAIM))), ChangeCause.COMMAND);
+        invites.invite(alice, "hovel_1", bob);
         CharacterId carol = characters.play(UUID.randomUUID(), "Carol");
-        invites.invite(alice, "house", carol);
+        invites.invite(alice, "hovel_1", carol);
         invites.accept(carol, Optional.empty());
 
         assertEquals("ownership.full", refusal(() -> invites.accept(bob, Optional.empty())));
+    }
+
+    @Test
+    void aBoughtClaimTakesAsManyCoOwnersAsInvited() {
+        for (String name : List.of("Bob2", "Carol", "Dave")) {
+            CharacterId invitee = characters.play(UUID.randomUUID(), name);
+            invites.invite(alice, "house", invitee);
+            invites.accept(invitee, Optional.empty());
+        }
+        invites.invite(alice, "house", bob);
+
+        assertEquals(5, invites.accept(bob, Optional.empty()).owners().size());
     }
 }

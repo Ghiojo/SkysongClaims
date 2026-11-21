@@ -10,6 +10,7 @@ import org.skysongdev.skysongClaims.sign.SignLocation;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +29,7 @@ class SqlSignRepositoryTest {
         DatabaseSchema.create(dataSource);
         claims = new SqlClaimRepository(dataSource);
         signs = new SqlSignRepository(dataSource);
-        claims.save(Claim.create("house", "other", false, 1, List.of(new ClaimRegion("world", "house"))));
+        claims.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))));
     }
 
     @Test

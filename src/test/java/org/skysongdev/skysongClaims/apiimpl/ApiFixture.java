@@ -23,6 +23,7 @@ import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.support.TestTypes;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * The real API over in-memory features, with a Free {@code hovel_1} (2 slots) and a bought
@@ -49,8 +50,8 @@ final class ApiFixture {
 
     ApiFixture() {
         store.observe(signs);
-        store.save(Claim.create("hovel_1", "hovel", true, 2, List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
-        store.save(Claim.create("house", "other", false, 1, List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
         api = new SkysongClaimsApiImpl(new SkysongClaimsApiImpl.Features(state, TestTypes::registry,
                 new ClaimLocator(state, regions), claims, ownership, limits, limitRules, signs, menuButtons),
                 new MainThread(() -> mainThread));

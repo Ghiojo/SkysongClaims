@@ -49,7 +49,7 @@ public final class OwnershipService {
         if (!characters.exists(character)) {
             return OwnershipCheck.UNKNOWN_CHARACTER;
         }
-        if (claim.openSlots() == 0) {
+        if (!claim.hasRoom()) {
             return OwnershipCheck.FULL;
         }
         Optional<ClaimType> type = types.get().find(claim.typeId());

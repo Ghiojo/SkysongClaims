@@ -23,6 +23,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,7 +62,7 @@ class SkysongClaimsApiImplTest {
         assertEquals(List.of("house", "hovel_1"), api.claims().all().stream().map(ClaimInfo::id).sorted().toList());
         ClaimInfo hovel = api.claims().find("hovel_1").orElseThrow();
         assertTrue(hovel.free());
-        assertEquals(2, hovel.openSlots());
+        assertEquals(OptionalInt.of(2), hovel.openSlots());
         assertEquals(Optional.of("house"), api.claims().ofRegion("world", "house").map(ClaimInfo::id));
         assertTrue(api.claims().find("castle").isEmpty());
     }
@@ -110,10 +111,14 @@ class SkysongClaimsApiImplTest {
         api.ownership().addOwner(economy, "house", alice);
 
         assertEquals(OwnershipCheck.ALREADY_OWNER, api.ownership().addOwner(economy, "house", alice));
-        assertEquals(OwnershipCheck.FULL, api.ownership().addOwner(economy, "house", bob));
+        api.ownership().addOwner(economy, "hovel_1", alice);
+        api.ownership().addOwner(economy, "hovel_1", bob);
+        CharacterId carol = fixture.characters.add(UUID.randomUUID(), "Carol");
+        assertEquals(OwnershipCheck.FULL, api.ownership().addOwner(economy, "hovel_1", carol));
+        assertEquals(OwnershipCheck.OK, api.ownership().addOwner(economy, "house", bob), "a bought Claim has no cap");
         assertEquals(OwnershipCheck.UNKNOWN_CHARACTER,
                 api.ownership().addOwner(economy, "hovel_1", new CharacterId(UUID.randomUUID(), "Ghost")));
-        assertEquals(List.of(alice), api.ownership().owners("house").stream().map(owner -> owner.character()).toList());
+        assertEquals(List.of(alice, bob), api.ownership().owners("house").stream().map(owner -> owner.character()).toList());
     }
 
     @Test

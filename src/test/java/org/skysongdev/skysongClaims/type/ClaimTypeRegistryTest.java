@@ -5,13 +5,14 @@ import org.skysongdev.skysongClaims.api.LimitScope;
 
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClaimTypeRegistryTest {
     private static ClaimType type(String id) {
-        return new ClaimType(id, id, 1, LimitScope.CHARACTER, 1, false, List.of(), Map.of());
+        return new ClaimType(id, id, 1, LimitScope.CHARACTER, OptionalInt.empty(), List.of(), Map.of());
     }
 
     @Test
@@ -26,7 +27,7 @@ class ClaimTypeRegistryTest {
 
     @Test
     void extraCantBeChanged() {
-        ClaimType type = new ClaimType("a", "A", 1, LimitScope.CHARACTER, 1, false, List.of(), Map.of("k", 1));
+        ClaimType type = new ClaimType("a", "A", 1, LimitScope.CHARACTER, OptionalInt.empty(), List.of(), Map.of("k", 1));
 
         assertThrows(UnsupportedOperationException.class, () -> type.extra().put("k", 2));
     }

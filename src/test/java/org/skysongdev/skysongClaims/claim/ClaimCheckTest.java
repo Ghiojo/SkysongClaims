@@ -14,6 +14,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ class ClaimCheckTest {
 
     @Test
     void reportsMissingRegionsWithoutRemovingThem() {
-        store.save(Claim.create("house", "other", false, 1,
+        store.save(Claim.create("house", "other", OptionalInt.empty(),
                 List.of(new ClaimRegion("world", "house"), new ClaimRegion("world", "gone"))), ChangeCause.COMMAND);
 
         ClaimCheck.Report report = check.run();
@@ -46,7 +47,7 @@ class ClaimCheckTest {
         CharacterId alice = characters.play(UUID.randomUUID(), "Alice");
         CharacterId bob = characters.play(UUID.randomUUID(), "Bob");
         CharacterId carol = characters.play(UUID.randomUUID(), "Carol");
-        store.save(Claim.create("house", "other", false, 2, List.of(new ClaimRegion("world", "house")))
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house")))
                 .withOwners(List.of(owner(alice), owner(bob)))
                 .withGroups(List.of(new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(carol)))),
                 ChangeCause.COMMAND);
@@ -68,7 +69,7 @@ class ClaimCheckTest {
     void releasingTheLastOwnerLeavesTheClaimUnownedWithNoGroups() {
         CharacterId alice = characters.play(UUID.randomUUID(), "Alice");
         CharacterId bob = characters.play(UUID.randomUUID(), "Bob");
-        store.save(Claim.create("house", "hovel", true, 2, List.of(new ClaimRegion("world", "house")))
+        store.save(Claim.create("house", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "house")))
                 .withOwners(List.of(owner(alice)))
                 .withGroups(List.of(new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(bob)))),
                 ChangeCause.COMMAND);
@@ -79,13 +80,13 @@ class ClaimCheckTest {
         Claim house = store.require("house");
         assertTrue(house.owners().isEmpty());
         assertTrue(house.groups().isEmpty());
-        assertEquals(2, house.openSlots());
+        assertEquals(OptionalInt.of(2), house.openSlots());
     }
 
     @Test
     void aCleanClaimIsLeftAlone() {
         CharacterId alice = characters.play(UUID.randomUUID(), "Alice");
-        store.save(Claim.create("house", "other", false, 1, List.of(new ClaimRegion("world", "house")))
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house")))
                 .withOwners(List.of(owner(alice))), ChangeCause.COMMAND);
         List<ClaimChange> changes = new ArrayList<>();
         store.observe(changes::add);

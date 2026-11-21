@@ -6,6 +6,7 @@ import org.skysongdev.skysongClaims.claim.Claim;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AsyncClaimRepositoryTest {
     private static Claim claim(String id) {
-        return Claim.create(id, "other", false, 1, List.of(new ClaimRegion("world", id)));
+        return Claim.create(id, "other", OptionalInt.empty(), List.of(new ClaimRegion("world", id)));
     }
 
     @Test

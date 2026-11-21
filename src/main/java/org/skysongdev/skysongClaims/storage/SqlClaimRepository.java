@@ -13,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -21,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,9 +30,9 @@ import javax.sql.DataSource;
 
 /** Saves Claims in the MySQL tables of {@link DatabaseSchema}. Blocking: wrap it in {@link AsyncClaimRepository}. */
 public final class SqlClaimRepository implements ClaimRepository {
-    private static final String UPSERT_CLAIM = "INSERT INTO claims (id, display_name, type_id, free, max_owners, for_sale_by) "
-            + "VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE display_name = VALUES(display_name), "
-            + "type_id = VALUES(type_id), free = VALUES(free), max_owners = VALUES(max_owners), "
+    private static final String UPSERT_CLAIM = "INSERT INTO claims (id, display_name, type_id, slots, for_sale_by) "
+            + "VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE display_name = VALUES(display_name), "
+            + "type_id = VALUES(type_id), slots = VALUES(slots), "
             + "for_sale_by = VALUES(for_sale_by)";
 
     private final DataSource dataSource;
@@ -48,12 +50,14 @@ public final class SqlClaimRepository implements ClaimRepository {
             Map<String, Map<String, String>> flags = loadFlags(connection);
             List<Claim> claims = new ArrayList<>();
             try (PreparedStatement select = connection.prepareStatement(
-                    "SELECT id, display_name, type_id, free, max_owners, for_sale_by FROM claims ORDER BY id");
+                    "SELECT id, display_name, type_id, slots, for_sale_by FROM claims ORDER BY id");
                  ResultSet rows = select.executeQuery()) {
                 while (rows.next()) {
                     String id = rows.getString("id");
-                    claims.add(new Claim(id, rows.getString("display_name"), rows.getString("type_id"),
-                            rows.getBoolean("free"), rows.getInt("max_owners"),
+                    int slotCount = rows.getInt("slots");
+                    // Read wasNull right after getInt: it answers for the last column read.
+                    OptionalInt slots = rows.wasNull() ? OptionalInt.empty() : OptionalInt.of(slotCount);
+                    claims.add(new Claim(id, rows.getString("display_name"), rows.getString("type_id"), slots,
                             regions.getOrDefault(id, List.of()), owners.getOrDefault(id, List.of()),
                             groups.getOrDefault(id, List.of()), Optional.ofNullable(rows.getString("for_sale_by")),
                             flags.getOrDefault(id, Map.of())));
@@ -156,9 +160,12 @@ public final class SqlClaimRepository implements ClaimRepository {
                 upsert.setString(1, claim.id());
                 upsert.setString(2, claim.displayName());
                 upsert.setString(3, claim.typeId());
-                upsert.setBoolean(4, claim.free());
-                upsert.setInt(5, claim.maxOwners());
-                upsert.setString(6, claim.saleSetBy().orElse(null));
+                if (claim.slots().isPresent()) {
+                    upsert.setInt(4, claim.slots().getAsInt());
+                } else {
+                    upsert.setNull(4, Types.INTEGER);
+                }
+                upsert.setString(5, claim.saleSetBy().orElse(null));
                 upsert.executeUpdate();
             }
             // Children are replaced whole; deleting a group also deletes its members.

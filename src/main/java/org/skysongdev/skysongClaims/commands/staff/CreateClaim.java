@@ -31,7 +31,7 @@ final class CreateClaim extends LeafCommand {
         messenger.send(sender, claim.free() ? "claims.created-free" : "claims.created",
                 unparsed("claim", claim.id()), unparsed("type", claim.typeId()),
                 unparsed("regions", Integer.toString(claim.regions().size())),
-                unparsed("slots", Integer.toString(claim.maxOwners())));
+                unparsed("slots", Integer.toString(claim.slots().orElse(0))));
     }
 
     @Override

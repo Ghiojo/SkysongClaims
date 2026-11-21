@@ -29,6 +29,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -50,7 +51,7 @@ class SignMenusTest {
         alice = characters.play(player.getUniqueId(), "Alice");
         ClaimState state = new ClaimState();
         store = new ClaimStore(state, new InMemoryClaimRepository());
-        store.save(Claim.create("hovel_1", "hovel", true, 2, List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
         OwnershipService ownership = new OwnershipService(store, TestTypes::registry,
                 new Limits(state, new LimitRules((what, e) -> {
                 })), characters, new MutableClock());

@@ -20,6 +20,7 @@ import org.skysongdev.skysongClaims.type.ClaimType;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongstats.api.CharacterId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -66,7 +67,7 @@ public final class SignMenus {
         ClaimMenu menu = new ClaimMenu(claim.id(), messenger.render("signs.menu.title", parsed("name", claim.displayName())));
         menu.set(INFO_SLOT, info(claim), null);
         Optional<CharacterId> character = characters.active(player.getUniqueId());
-        if (claim.free() && claim.openSlots() > 0 && character.filter(claim::isOwnedBy).isEmpty()) {
+        if (claim.free() && claim.hasRoom() && character.filter(claim::isOwnedBy).isEmpty()) {
             menu.set(TAKE_SLOT, item(Material.LIME_DYE, "signs.menu.take", List.of()), viewer -> take(viewer, claim.id()));
         }
         if (character.filter(claim::isOwnedBy).isPresent()) {
@@ -98,13 +99,15 @@ public final class SignMenus {
         String typeName = types.get().find(claim.typeId()).map(ClaimType::displayName).orElse(claim.typeId());
         String owners = claim.owners().stream().map(ClaimOwner::character).map(ClaimArguments::describe)
                 .collect(Collectors.joining(", "));
-        List<Component> lore = List.of(
+        List<Component> lore = new ArrayList<>(List.of(
                 messenger.render("signs.menu.info-type", parsed("type_name", typeName)),
                 messenger.render(claim.isOwned() ? "signs.menu.info-owners" : "signs.menu.info-no-owners",
-                        unparsed("owners", owners)),
-                messenger.render(claim.free() ? "signs.menu.info-slots" : "signs.menu.info-owner-slots",
-                        unparsed("open", Integer.toString(claim.openSlots())),
-                        unparsed("slots", Integer.toString(claim.maxOwners()))));
+                        unparsed("owners", owners))));
+        if (claim.free()) {
+            lore.add(messenger.render("signs.menu.info-slots",
+                    unparsed("open", Integer.toString(claim.openSlots().orElseThrow())),
+                    unparsed("slots", Integer.toString(claim.slots().orElseThrow()))));
+        }
         ItemStack item = new ItemStack(Material.OAK_SIGN);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(plain(messenger.render("signs.menu.info-name", parsed("name", claim.displayName()))));
@@ -134,7 +137,7 @@ public final class SignMenus {
                     .orElseThrow(() -> RefusedException.of("command.you-have-no-character"));
             Claim claim = ownership.take(character, claimId);
             messenger.send(player, "player.taken", unparsed("claim", claim.id()), parsed("name", claim.displayName()),
-                    unparsed("open", Integer.toString(claim.openSlots())));
+                    unparsed("open", Integer.toString(claim.openSlots().orElseThrow())));
         } catch (RefusedException refusal) {
             messenger.send(player, refusal);
         }

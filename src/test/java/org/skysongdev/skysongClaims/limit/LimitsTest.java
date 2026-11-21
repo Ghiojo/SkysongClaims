@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +27,7 @@ class LimitsTest {
     private static final UUID PLAYER = UUID.randomUUID();
     private static final CharacterId ALICE = new CharacterId(PLAYER, "Alice");
     private static final CharacterId ALICIA = new CharacterId(PLAYER, "Alicia");
-    private static final ClaimType MANOR = new ClaimType("manor", "Manor", 1, LimitScope.ACCOUNT, 1, false, List.of(), Map.of());
+    private static final ClaimType MANOR = new ClaimType("manor", "Manor", 1, LimitScope.ACCOUNT, OptionalInt.empty(), List.of(), Map.of());
 
     private final List<String> failures = new ArrayList<>();
     private final LimitRules rules = new LimitRules((what, e) -> failures.add(what));
@@ -38,7 +39,7 @@ class LimitsTest {
         for (CharacterId owner : owners) {
             list.add(new ClaimOwner(owner, Instant.EPOCH, OwnerCause.STAFF));
         }
-        state.load(concat(state.all(), Claim.create(id, type, false, 3, List.of(new ClaimRegion("world", id))).withOwners(list)));
+        state.load(concat(state.all(), Claim.create(id, type, OptionalInt.empty(), List.of(new ClaimRegion("world", id))).withOwners(list)));
     }
 
     private static List<Claim> concat(List<Claim> claims, Claim claim) {
