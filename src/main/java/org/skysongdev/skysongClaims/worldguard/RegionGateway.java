@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.worldguard;
 
+import org.bukkit.Location;
 import org.skysongdev.skysongClaims.claim.ClaimRegion;
 
 import java.util.List;
@@ -11,6 +12,9 @@ public interface RegionGateway {
 
     /** @return the ids of every region in the world, for tab completion; empty when the world isn't loaded */
     List<String> regionIds(String world);
+
+    /** @return the regions at the location, highest WorldGuard priority first */
+    List<ClaimRegion> regionsAt(Location location);
 
     /**
      * Makes the region's owners and members exactly those of {@code access}, removing any

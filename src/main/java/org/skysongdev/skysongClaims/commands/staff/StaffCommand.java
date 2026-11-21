@@ -2,6 +2,7 @@ package org.skysongdev.skysongClaims.commands.staff;
 
 import org.skysongdev.skysongClaims.claim.ClaimCheck;
 import org.skysongdev.skysongClaims.commands.CommandGroup;
+import org.skysongdev.skysongClaims.ownership.OwnershipService;
 
 import java.util.function.Supplier;
 
@@ -11,7 +12,8 @@ public final class StaffCommand extends CommandGroup {
      * @param reload reloads every config file
      * @param check  runs {@code /sclaims check}
      */
-    public StaffCommand(StaffSupport support, Runnable reload, Supplier<ClaimCheck.Report> check) {
+    public StaffCommand(StaffSupport support, OwnershipService ownership, Runnable reload,
+                        Supplier<ClaimCheck.Report> check) {
         super("sclaims", StaffSupport.ADMIN_PERMISSION, support.messenger());
         register(new CreateClaim(support));
         register(new DeleteClaim(support));
@@ -21,6 +23,8 @@ public final class StaffCommand extends CommandGroup {
         register(new SetFree(support));
         register(new SetMaxOwners(support));
         register(new RenameClaim(support));
+        register(new AddOwner(support, ownership));
+        register(new RemoveOwner(support, ownership));
         register(new ClaimInfo(support));
         register(new ListClaims(support));
         register(new CheckCommand(support, check));

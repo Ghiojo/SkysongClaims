@@ -9,12 +9,16 @@ import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.character.StatsCharacterDirectory;
 import org.skysongdev.skysongClaims.claim.Claim;
 import org.skysongdev.skysongClaims.claim.ClaimCheck;
+import org.skysongdev.skysongClaims.claim.ClaimLocator;
 import org.skysongdev.skysongClaims.claim.ClaimService;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
+import org.skysongdev.skysongClaims.commands.CharacterArguments;
 import org.skysongdev.skysongClaims.commands.ClaimArguments;
 import org.skysongdev.skysongClaims.commands.RootCommand;
 import org.skysongdev.skysongClaims.commands.SubCommand;
+import org.skysongdev.skysongClaims.commands.player.PlayerCommand;
+import org.skysongdev.skysongClaims.commands.player.PlayerSupport;
 import org.skysongdev.skysongClaims.commands.staff.StaffCommand;
 import org.skysongdev.skysongClaims.commands.staff.StaffSupport;
 import org.skysongdev.skysongClaims.config.ConfigException;
@@ -22,7 +26,11 @@ import org.skysongdev.skysongClaims.config.ConfigHolder;
 import org.skysongdev.skysongClaims.config.ConfigLoader;
 import org.skysongdev.skysongClaims.config.ConfigSection;
 import org.skysongdev.skysongClaims.config.YamlFiles;
+import org.skysongdev.skysongClaims.limit.LimitRules;
+import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.Messenger;
+import org.skysongdev.skysongClaims.ownership.InviteService;
+import org.skysongdev.skysongClaims.ownership.OwnershipService;
 import org.skysongdev.skysongClaims.storage.ClaimStorage;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongClaims.worldguard.AccessProjection;
@@ -35,6 +43,7 @@ import org.skysongdev.skysongstats.api.SkysongStatsApi;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -85,8 +94,18 @@ public final class SkysongClaims extends JavaPlugin {
         sync.syncAll();
         getServer().getPluginManager().registerEvents(new SyncListener(sync), this);
 
-        StaffSupport staff = new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions), messenger);
-        registerCommand("sclaims", new StaffCommand(staff, () -> {
+        LimitRules limitRules = new LimitRules((what, e) -> getLogger().log(Level.WARNING, what, e));
+        Limits limits = new Limits(state, limitRules);
+        OwnershipService ownership = new OwnershipService(store, types, limits, characters, Clock.systemUTC());
+        InviteService invites = new InviteService(store, ownership, () -> config.current().settings().inviteExpiry(),
+                Clock.systemUTC());
+        CharacterArguments characterArguments = new CharacterArguments(characters);
+        registerCommand("sclaim", new PlayerCommand(new PlayerSupport(state, new ClaimLocator(state, regions), ownership,
+                invites, limits, types, characterArguments, messenger)));
+
+        StaffSupport staff = new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions),
+                characterArguments, messenger);
+        registerCommand("sclaims", new StaffCommand(staff, ownership, () -> {
             config.reload();
             warnAboutUnknownTypes(claims);
         }, () -> {

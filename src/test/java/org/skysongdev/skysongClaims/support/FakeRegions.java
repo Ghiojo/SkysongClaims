@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.support;
 
+import org.bukkit.Location;
 import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.worldguard.RegionGateway;
 
@@ -16,6 +17,7 @@ public final class FakeRegions implements RegionGateway {
     private final Set<ClaimRegion> regions = new HashSet<>();
     private final Map<ClaimRegion, RegionAccess> applied = new HashMap<>();
     private final Set<String> unknownFlags = new HashSet<>();
+    private List<ClaimRegion> standingIn = List.of();
 
     public FakeRegions add(String world, String... ids) {
         for (String id : ids) {
@@ -37,6 +39,17 @@ public final class FakeRegions implements RegionGateway {
     /** @return what was last applied to the region, or {@code null} */
     public RegionAccess applied(String world, String id) {
         return applied.get(new ClaimRegion(world, id));
+    }
+
+    /** Makes {@link #regionsAt} answer these regions for every location. */
+    public FakeRegions standingIn(ClaimRegion... at) {
+        standingIn = List.of(at);
+        return this;
+    }
+
+    @Override
+    public List<ClaimRegion> regionsAt(Location location) {
+        return standingIn;
     }
 
     @Override

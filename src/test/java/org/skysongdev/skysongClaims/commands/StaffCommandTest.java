@@ -19,11 +19,18 @@ import org.skysongdev.skysongClaims.commands.staff.StaffCommand;
 import org.skysongdev.skysongClaims.commands.staff.StaffSupport;
 import org.skysongdev.skysongClaims.config.ConfigException;
 import org.skysongdev.skysongClaims.messaging.Messenger;
+import org.skysongdev.skysongClaims.limit.LimitRules;
+import org.skysongdev.skysongClaims.limit.Limits;
+import org.skysongdev.skysongClaims.ownership.OwnershipService;
+import org.skysongdev.skysongClaims.support.FakeCharacters;
 import org.skysongdev.skysongClaims.support.FakeRegions;
 import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.support.TestTypes;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 
+import org.skysongdev.skysongstats.api.CharacterId;
+
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -38,6 +45,7 @@ class StaffCommandTest {
     private ClaimState state;
     private StaffCommand command;
     private boolean reloadFails;
+    private CharacterId alice;
 
     @BeforeEach
     void setUp() {
@@ -48,9 +56,15 @@ class StaffCommandTest {
         state = new ClaimState();
         Supplier<ClaimTypeRegistry> types = TestTypes::registry;
         FakeRegions regions = new FakeRegions().add("world", "hovel_1", "hovel_2").add("world_nether", "cellar");
-        ClaimService claims = new ClaimService(new ClaimStore(state, new InMemoryClaimRepository()), types, regions);
+        ClaimStore store = new ClaimStore(state, new InMemoryClaimRepository());
+        ClaimService claims = new ClaimService(store, types, regions);
         Messenger messenger = TestMessages.messenger();
-        command = new StaffCommand(new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions), messenger),
+        FakeCharacters characters = new FakeCharacters();
+        OwnershipService ownership = new OwnershipService(store, types, new Limits(state, new LimitRules((w, e) -> {
+        })), characters, Clock.systemUTC());
+        alice = characters.play(server.addPlayer("Alice").getUniqueId(), "Alice");
+        command = new StaffCommand(new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions),
+                new CharacterArguments(characters), messenger), ownership,
                 () -> {
                     if (reloadFails) {
                         throw new ConfigException("types.yml: broken");
@@ -171,6 +185,30 @@ class StaffCommandTest {
         reloadFails = true;
 
         assertTrue(run(staff, "reload").get(0).contains("types.yml: broken"));
+    }
+
+    @Test
+    void staffAddAndRemoveOwners() {
+        run(staff, "create a other hovel_1");
+
+        assertTrue(run(staff, "addowner a Alice").get(0).contains("Alice now owns a"));
+        assertTrue(state.find("a").orElseThrow().isOwnedBy(alice));
+        assertTrue(run(staff, "addowner a Alice").get(0).contains("already owns"));
+
+        assertTrue(run(staff, "removeowner a Alice").get(0).contains("Alice no longer owns a"));
+        assertTrue(state.find("a").orElseThrow().owners().isEmpty());
+        assertTrue(run(staff, "removeowner a Alice").get(0).contains("No character of Alice"));
+        assertTrue(run(staff, "addowner a Nobody").get(0).contains("no player called Nobody"));
+    }
+
+    @Test
+    void forceSkipsTheLimit() {
+        run(staff, "create a hovel hovel_1");
+        run(staff, "create b hovel hovel_2");
+        run(staff, "addowner a Alice");
+
+        assertTrue(run(staff, "addowner b Alice").get(0).contains("as many hovel Claims as allowed"));
+        assertTrue(run(staff, "addowner b Alice -force").get(0).contains("Alice now owns b"));
     }
 
     @Test
