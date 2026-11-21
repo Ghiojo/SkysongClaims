@@ -3,19 +3,69 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
+// The api module is configured first so its classes can be added to the plugin jar below.
+evaluationDependsOn(':api')
+
 group = 'org.skysongdev'
 version = '1.0'
 
 repositories {
+    // EngineHub serves WorldGuard and WorldEdit, and nothing else is taken from it.
+    maven {
+        name = "enginehub"
+        url = "https://maven.enginehub.org/repo/"
+        content {
+            includeGroupByRegex 'com\\.sk89q.*'
+        }
+    }
     mavenCentral()
     maven {
         name = "papermc-repo"
         url = "https://repo.papermc.io/repository/maven-public/"
     }
+    // Publishes the SkysongStats API module straight from its GitHub repository.
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
 }
 
+def paperApi = 'io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT'
+// The SkysongStats API at a release tag. JitPack publishes its one module (api) as
+// the repository itself, so the coordinate has no ":api".
+def skysongStatsApi = 'com.github.Ghiojo:SkysongStats:1.5.0'
+// 7.0.17 is the newest WorldGuard built for Java 21 and Paper 1.21.11; 7.0.18 and later
+// need Java 25 and Paper 26.
+def worldGuard = 'com.sk89q.worldguard:worldguard-bukkit:7.0.17'
+
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    // The public API (api/). Its classes are added to the plugin jar below.
+    implementation project(':api')
+    compileOnly(paperApi)
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+    // Hard dependencies (plugin.yml depend:): both ship on the server, so neither is shaded.
+    compileOnly(skysongStatsApi)
+    compileOnly(worldGuard) {
+        exclude group: 'org.bukkit'
+        exclude group: 'org.spigotmc'
+        exclude group: 'io.papermc.paper'
+    }
+
+    testImplementation platform('org.junit:junit-bom:6.0.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // MockBukkit 4.116.3 is built against Paper 1.21.11 and doesn't bring the Paper API itself.
+    testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.116.3'
+    testImplementation(paperApi)
+    testImplementation(skysongStatsApi)
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat 'full'
+    }
 }
 
 tasks {
@@ -23,7 +73,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.11")
     }
 }
 
@@ -43,6 +93,12 @@ tasks.withType(JavaCompile).configureEach {
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release.set(targetJavaVersion)
     }
+}
+
+// The api classes ship inside the plugin jar, so the server has exactly one copy of them.
+// Plugins that use the API compile against it with compileOnly and never shade it.
+tasks.named('jar') {
+    from(project(':api').sourceSets.main.output)
 }
 
 processResources {
