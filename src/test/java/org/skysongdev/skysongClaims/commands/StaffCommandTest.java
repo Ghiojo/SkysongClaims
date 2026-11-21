@@ -22,7 +22,11 @@ import org.skysongdev.skysongClaims.messaging.Messenger;
 import org.skysongdev.skysongClaims.limit.LimitRules;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.ownership.OwnershipService;
+import org.skysongdev.skysongClaims.sign.InMemorySignRepository;
+import org.skysongdev.skysongClaims.sign.SignService;
+import org.skysongdev.skysongClaims.sign.SignText;
 import org.skysongdev.skysongClaims.support.FakeCharacters;
+import org.skysongdev.skysongClaims.support.FakeSignBlocks;
 import org.skysongdev.skysongClaims.support.FakeRegions;
 import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.support.TestTypes;
@@ -65,6 +69,8 @@ class StaffCommandTest {
         alice = characters.play(server.addPlayer("Alice").getUniqueId(), "Alice");
         command = new StaffCommand(new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions),
                 new CharacterArguments(characters), messenger), ownership,
+                new SignService(state, new InMemorySignRepository(), new FakeSignBlocks(), new SignText(messenger, types), log -> {
+                }),
                 () -> {
                     if (reloadFails) {
                         throw new ConfigException("types.yml: broken");

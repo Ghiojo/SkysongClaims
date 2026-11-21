@@ -65,6 +65,34 @@ flag:
   set: "<green>Set <yellow><flag></yellow> on <claim> to <white><value>"
   cleared: "<green>Cleared <yellow><flag></yellow> on <claim>."
 
+signs:
+  # The four lines of a Claim sign. The fourth is the price another plugin sets.
+  line-name: "<name>"
+  line-type: "<type_name>"
+  free-open: "<green><open> of <slots> open"
+  free-full: "<red>Full"
+  for-sale: "<green>For sale"
+  owned: "<gray>Owned"
+  unowned: ""
+  look-at-sign: "<red>Look at a sign first."
+  not-a-sign: "<red>That block is not a sign."
+  not-linked: "<red>That sign doesn't show a Claim."
+  linked: "<green>This sign now shows the Claim <yellow><claim></yellow>."
+  unlinked-from: "<green>This sign no longer shows <yellow><claim></yellow>."
+  unlinked: "<green>Unlinked and broke the Claim sign."
+  protected: "<red>Claim signs can only be removed by staff."
+  menu:
+    title: "<name>"
+    info-name: "<name>"
+    info-type: "<gray>Type: <white><type_name>"
+    info-owners: "<gray>Owned by: <white><owners>"
+    info-no-owners: "<gray>Owned by: <white>nobody"
+    info-slots: "<gray>Slots: <white><open> of <slots> open"
+    info-owner-slots: "<gray>Room for <white><slots></white> owner(s)"
+    take: "<green>Take a slot"
+    leave: "<red>Leave this Claim"
+    leave-confirm: "<dark_red>Click again to leave"
+
 player:
   not-in-claim: "<red>You aren't standing in a Claim."
   taken: "<green>You now live in <reset><name></reset><green>. <open> slot(s) left."

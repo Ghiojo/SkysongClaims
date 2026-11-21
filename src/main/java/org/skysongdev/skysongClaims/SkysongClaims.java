@@ -33,6 +33,12 @@ import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.Messenger;
 import org.skysongdev.skysongClaims.ownership.InviteService;
 import org.skysongdev.skysongClaims.ownership.OwnershipService;
+import org.skysongdev.skysongClaims.sign.BukkitSignBlocks;
+import org.skysongdev.skysongClaims.sign.MenuButtons;
+import org.skysongdev.skysongClaims.sign.SignListener;
+import org.skysongdev.skysongClaims.sign.SignMenus;
+import org.skysongdev.skysongClaims.sign.SignService;
+import org.skysongdev.skysongClaims.sign.SignText;
 import org.skysongdev.skysongClaims.storage.ClaimStorage;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongClaims.worldguard.AccessProjection;
@@ -107,9 +113,19 @@ public final class SkysongClaims extends JavaPlugin {
                 invites, limits, types, characterArguments, messenger), groups,
                 new FlagService(store, () -> config.current().settings().ownerFlags(), types, regions)));
 
+        SignService signs = new SignService(state, storage.signs(), new BukkitSignBlocks(),
+                new SignText(messenger, types), getLogger()::info);
+        signs.load();
+        store.observe(signs);
+        config.onReload(loaded -> signs.redrawAll());
+        signs.redrawAll();
+        MenuButtons menuButtons = new MenuButtons();
+        getServer().getPluginManager().registerEvents(new SignListener(signs,
+                new SignMenus(state, ownership, characters, types, menuButtons, messenger), state, messenger), this);
+
         StaffSupport staff = new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions),
                 characterArguments, messenger);
-        registerCommand("sclaims", new StaffCommand(staff, ownership, () -> {
+        registerCommand("sclaims", new StaffCommand(staff, ownership, signs, () -> {
             config.reload();
             warnAboutUnknownTypes(claims);
         }, () -> {
