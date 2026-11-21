@@ -23,6 +23,13 @@ public record ClaimGroup(String id, String displayName, Set<GroupPermission> per
         members = java.util.Collections.unmodifiableSet(new LinkedHashSet<>(members));
     }
 
+    /** @return the group without that member */
+    public ClaimGroup withoutMember(CharacterId member) {
+        Set<CharacterId> remaining = new LinkedHashSet<>(members);
+        remaining.remove(member);
+        return new ClaimGroup(id, displayName, permissions, remaining);
+    }
+
     public boolean has(GroupPermission permission) {
         return permissions.contains(permission);
     }

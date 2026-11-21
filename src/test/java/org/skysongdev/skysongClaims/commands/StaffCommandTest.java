@@ -9,6 +9,7 @@ import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.command.ConsoleCommandSenderMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
+import org.skysongdev.skysongClaims.claim.ClaimCheck;
 import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimService;
 import org.skysongdev.skysongClaims.claim.ClaimState;
@@ -54,7 +55,7 @@ class StaffCommandTest {
                     if (reloadFails) {
                         throw new ConfigException("types.yml: broken");
                     }
-                });
+                }, () -> new ClaimCheck.Report(List.of(new ClaimCheck.Missing("a", new ClaimRegion("world", "gone"))), List.of()));
     }
 
     @AfterEach
@@ -170,6 +171,14 @@ class StaffCommandTest {
         reloadFails = true;
 
         assertTrue(run(staff, "reload").get(0).contains("types.yml: broken"));
+    }
+
+    @Test
+    void checkReportsWhatItFound() {
+        List<String> said = run(staff, "check");
+
+        assertTrue(said.get(0).contains("world:gone"), said.toString());
+        assertTrue(said.get(1).contains("1 missing region(s), 0 character(s) released"), said.toString());
     }
 
     @Test
