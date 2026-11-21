@@ -4,6 +4,9 @@ A Paper plugin that groups WorldGuard regions into **Claims** owned by SkysongSt
 with per-type ownership limits, owner build groups, open use of doors and containers, claim signs,
 and an API for SkysongEconomy to sell Claims.
 
+Server owners: read the [owner's manual](docs/owners-manual.md) for every file, command and
+permission, and the WorldGuard permissions players must not have.
+
 ## Requirements
 
 | Needs | Why |
