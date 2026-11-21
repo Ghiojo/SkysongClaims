@@ -64,7 +64,7 @@ class WorldGuardSyncTest {
         store.save(house(List.of(owner(alice)),
                 List.of(new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(bob)))), ChangeCause.COMMAND);
 
-        RegionAccess expected = new RegionAccess(Set.of(ALICE), Set.of(BOB), ClaimTypesParser.DEFAULT_OPEN_USE);
+        RegionAccess expected = new RegionAccess(Set.of(ALICE), Set.of(BOB), ClaimTypesParser.DEFAULT_OPEN_USE, java.util.Map.of());
         assertEquals(expected, regions.applied("world", "house"));
         assertEquals(expected, regions.applied("world", "garden"));
     }
@@ -73,7 +73,7 @@ class WorldGuardSyncTest {
     void anUnownedClaimStillOpensDoorsAndChests() {
         store.save(house(List.of(), List.of()), ChangeCause.COMMAND);
 
-        assertEquals(new RegionAccess(Set.of(), Set.of(), ClaimTypesParser.DEFAULT_OPEN_USE), regions.applied("world", "house"));
+        assertEquals(new RegionAccess(Set.of(), Set.of(), ClaimTypesParser.DEFAULT_OPEN_USE, java.util.Map.of()), regions.applied("world", "house"));
     }
 
     @Test

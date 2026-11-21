@@ -15,7 +15,7 @@ libraries:
 commands:
   sclaim:
     description: "Your Claims: take a Free Claim, invite co-owners, leave"
-    usage: "/sclaim <take|invite|accept|deny|leave|group|info|list>"
+    usage: "/sclaim <take|invite|accept|deny|leave|group|flag|info|list>"
     permission: skysongclaims.use
     # Bukkit doesn't give an alias that another plugin's command uses, so /sc only works when it's free.
     aliases: [sc]

@@ -47,7 +47,8 @@ class SqlClaimRepositoryTest {
                 .withGroups(List.of(
                         new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), new LinkedHashSet<>(List.of(BOB, ALICE))),
                         new ClaimGroup("guests", "Guests", Set.of(), Set.of())))
-                .withSale(Optional.of("SkysongEconomy"));
+                .withSale(Optional.of("SkysongEconomy"))
+                .withFlags(java.util.Map.of("greeting", "Welcome", "farewell", "Bye"));
     }
 
     @Test
@@ -69,6 +70,7 @@ class SqlClaimRepositoryTest {
                 .withOwners(List.of())
                 .withGroups(List.of())
                 .withSale(Optional.empty())
+                .withFlags(java.util.Map.of("greeting", "Hi"))
                 .withType("other");
 
         repository.save(changed);

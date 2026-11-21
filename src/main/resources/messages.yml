@@ -59,6 +59,12 @@ group:
   none: "<gray><claim> has no groups. Make one with /sclaim group <claim> create <name>."
   line: "<gray>- <yellow><name></yellow> (<group>): <white><members>"
 
+flag:
+  not-editable: "<red>Owners can't set <yellow><flag></yellow>. They can set: <white><flags>"
+  bad-value: "<red>WorldGuard won't take that for <flag>: <white><problem>"
+  set: "<green>Set <yellow><flag></yellow> on <claim> to <white><value>"
+  cleared: "<green>Cleared <yellow><flag></yellow> on <claim>."
+
 player:
   not-in-claim: "<red>You aren't standing in a Claim."
   taken: "<green>You now live in <reset><name></reset><green>. <open> slot(s) left."
@@ -116,6 +122,7 @@ claims:
     owners: "<gray>Owned by: <white><owners>"
     no-owners: "<gray>Owned by: <white>nobody"
     groups: "<gray>Groups: <white><groups>"
+    flags: "<gray>Owner flags: <white><flags>"
     for-sale: "<gray>For sale, set by <white><plugin>"
   list:
     header: "<gold><count> Claim(s):"

@@ -53,7 +53,14 @@ public final class DatabaseSchema {
                     + "position INT NOT NULL, "
                     + "PRIMARY KEY (claim_id, group_id, player_uuid, profile), "
                     + "FOREIGN KEY (claim_id, group_id) REFERENCES claim_groups(claim_id, group_id) "
-                    + "ON DELETE CASCADE) ENGINE=InnoDB");
+                    + "ON DELETE CASCADE) ENGINE=InnoDB",
+            // The WorldGuard flags owners set, kept here so every region (also ones added later) gets them.
+            "CREATE TABLE IF NOT EXISTS claim_flags ("
+                    + "claim_id VARCHAR(32) NOT NULL, "
+                    + "flag VARCHAR(64) NOT NULL, "
+                    + "flag_value VARCHAR(1024) NOT NULL, "
+                    + "PRIMARY KEY (claim_id, flag), "
+                    + "FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE) ENGINE=InnoDB");
 
     private DatabaseSchema() {
     }

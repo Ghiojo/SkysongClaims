@@ -43,7 +43,7 @@ public final class AccessProjection {
             }
         }
         members.removeAll(owners);
-        return new RegionAccess(owners, members, openUse(claim));
+        return new RegionAccess(owners, members, openUse(claim), claim.flags());
     }
 
     /** A Claim whose type was removed from types.yml keeps the standard open-use flags, so chests never lock. */

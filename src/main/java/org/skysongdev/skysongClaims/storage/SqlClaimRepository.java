@@ -45,6 +45,7 @@ public final class SqlClaimRepository implements ClaimRepository {
             Map<String, List<ClaimRegion>> regions = loadRegions(connection);
             Map<String, List<ClaimOwner>> owners = loadOwners(connection);
             Map<String, List<ClaimGroup>> groups = loadGroups(connection);
+            Map<String, Map<String, String>> flags = loadFlags(connection);
             List<Claim> claims = new ArrayList<>();
             try (PreparedStatement select = connection.prepareStatement(
                     "SELECT id, display_name, type_id, free, max_owners, for_sale_by FROM claims ORDER BY id");
@@ -54,7 +55,8 @@ public final class SqlClaimRepository implements ClaimRepository {
                     claims.add(new Claim(id, rows.getString("display_name"), rows.getString("type_id"),
                             rows.getBoolean("free"), rows.getInt("max_owners"),
                             regions.getOrDefault(id, List.of()), owners.getOrDefault(id, List.of()),
-                            groups.getOrDefault(id, List.of()), Optional.ofNullable(rows.getString("for_sale_by"))));
+                            groups.getOrDefault(id, List.of()), Optional.ofNullable(rows.getString("for_sale_by")),
+                            flags.getOrDefault(id, Map.of())));
                 }
             }
             return claims;
@@ -117,6 +119,18 @@ public final class SqlClaimRepository implements ClaimRepository {
         return groups;
     }
 
+    private static Map<String, Map<String, String>> loadFlags(Connection connection) throws SQLException {
+        Map<String, Map<String, String>> flags = new HashMap<>();
+        try (PreparedStatement select = connection.prepareStatement("SELECT claim_id, flag, flag_value FROM claim_flags");
+             ResultSet rows = select.executeQuery()) {
+            while (rows.next()) {
+                flags.computeIfAbsent(rows.getString("claim_id"), id -> new HashMap<>())
+                        .put(rows.getString("flag"), rows.getString("flag_value"));
+            }
+        }
+        return flags;
+    }
+
     private static CharacterId character(ResultSet rows) throws SQLException {
         return new CharacterId(UUID.fromString(rows.getString("player_uuid")), rows.getString("profile"));
     }
@@ -148,7 +162,7 @@ public final class SqlClaimRepository implements ClaimRepository {
                 upsert.executeUpdate();
             }
             // Children are replaced whole; deleting a group also deletes its members.
-            for (String table : List.of("claim_regions", "claim_owners", "claim_groups")) {
+            for (String table : List.of("claim_regions", "claim_owners", "claim_groups", "claim_flags")) {
                 try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + table + " WHERE claim_id = ?")) {
                     delete.setString(1, claim.id());
                     delete.executeUpdate();
@@ -157,6 +171,7 @@ public final class SqlClaimRepository implements ClaimRepository {
             insertRegions(connection, claim);
             insertOwners(connection, claim);
             insertGroups(connection, claim);
+            insertFlags(connection, claim);
         });
     }
 
@@ -217,6 +232,19 @@ public final class SqlClaimRepository implements ClaimRepository {
             }
             groups.executeBatch();
             members.executeBatch();
+        }
+    }
+
+    private static void insertFlags(Connection connection, Claim claim) throws SQLException {
+        try (PreparedStatement insert = connection.prepareStatement(
+                "INSERT INTO claim_flags (claim_id, flag, flag_value) VALUES (?, ?, ?)")) {
+            for (Map.Entry<String, String> flag : claim.flags().entrySet()) {
+                insert.setString(1, claim.id());
+                insert.setString(2, flag.getKey());
+                insert.setString(3, flag.getValue());
+                insert.addBatch();
+            }
+            insert.executeBatch();
         }
     }
 

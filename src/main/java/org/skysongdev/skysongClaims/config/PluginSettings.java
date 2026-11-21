@@ -5,6 +5,7 @@ import org.skysongdev.skysongClaims.storage.DatabaseSettings;
 import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -17,9 +18,10 @@ import java.util.regex.Pattern;
  * @param defaultLimitScope whether limits count per character or per account, for types that don't say
  * @param inviteExpiry      how long a co-owner invite waits for an answer
  * @param groupLimits       how many groups a Claim may have and members a group may have; 0 for no limit
+ * @param ownerFlags        the WorldGuard flags owners may set with {@code /sclaim flag}, lower case
  */
 public record PluginSettings(DatabaseSettings database, LimitScope defaultLimitScope, Duration inviteExpiry,
-                             GroupLimits groupLimits) {
+                             GroupLimits groupLimits, List<String> ownerFlags) {
     /** File name in the data folder and in the jar. */
     public static final String FILE = "config.yml";
 
@@ -30,6 +32,7 @@ public record PluginSettings(DatabaseSettings database, LimitScope defaultLimitS
         Objects.requireNonNull(defaultLimitScope, "defaultLimitScope");
         Objects.requireNonNull(inviteExpiry, "inviteExpiry");
         Objects.requireNonNull(groupLimits, "groupLimits");
+        ownerFlags = List.copyOf(ownerFlags);
     }
 
     /** @throws ConfigException when a setting has a value the plugin can't use */
@@ -40,7 +43,10 @@ public record PluginSettings(DatabaseSettings database, LimitScope defaultLimitS
         return new PluginSettings(DatabaseSettings.parse(root.section("database")), scope,
                 duration(root, "invite-expiry", "5m"),
                 new GroupLimits(atLeastZero(root, "max-groups-per-claim", 5),
-                        atLeastZero(root, "max-members-per-group", 0)));
+                        atLeastZero(root, "max-members-per-group", 0)),
+                root.contains("owner-flags")
+                        ? root.strings("owner-flags").stream().map(flag -> flag.trim().toLowerCase(Locale.ROOT)).toList()
+                        : List.of("greeting", "farewell"));
     }
 
     private static int atLeastZero(ConfigSection root, String key, int fallback) {

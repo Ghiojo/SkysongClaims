@@ -20,3 +20,7 @@ invite-expiry: 5m
 # may hold. 0 means no limit.
 max-groups-per-claim: 5
 max-members-per-group: 0
+
+# The WorldGuard flags owners may set on their whole Claim with /sclaim flag. build and the
+# type's open-use flags are always refused, even if listed here.
+owner-flags: [greeting, farewell]
