@@ -2,6 +2,7 @@ package org.skysongdev.skysongClaims.commands.staff;
 
 import org.skysongdev.skysongClaims.claim.ClaimService;
 import org.skysongdev.skysongClaims.claim.ClaimState;
+import org.skysongdev.skysongClaims.commands.CharacterArguments;
 import org.skysongdev.skysongClaims.commands.ClaimArguments;
 import org.skysongdev.skysongClaims.messaging.Messenger;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
@@ -14,6 +15,7 @@ public record StaffSupport(
         ClaimState state,
         Supplier<ClaimTypeRegistry> types,
         ClaimArguments arguments,
+        CharacterArguments characterArguments,
         Messenger messenger) {
 
     /** Lets staff use every {@code /sclaims} command and do everything in any Claim. */

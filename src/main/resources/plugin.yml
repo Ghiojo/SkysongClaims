@@ -13,12 +13,21 @@ libraries:
   - com.zaxxer:HikariCP:6.2.1
 
 commands:
+  sclaim:
+    description: "Your Claims: take a Free Claim, invite co-owners, leave"
+    usage: "/sclaim <take|invite|accept|deny|leave|info|list>"
+    permission: skysongclaims.use
+    # Bukkit doesn't give an alias that another plugin's command uses, so /sc only works when it's free.
+    aliases: [sc]
   sclaims:
     description: "Staff commands for Claims"
-    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|info|list|check|reload>"
+    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|addowner|removeowner|info|list|check|reload>"
     permission: skysongclaims.admin
 
 permissions:
+  skysongclaims.use:
+    description: "Use /sclaim."
+    default: true
   skysongclaims.admin:
     description: "Use /sclaims and do everything in any Claim, including removing owners."
     default: op

@@ -27,4 +27,17 @@ class PluginSettingsTest {
     void refusesAnUnknownLimitPer() {
         assertThrows(ConfigException.class, () -> parse("limit-per: town"));
     }
+
+    @Test
+    void invitesExpireAfterFiveMinutesByDefault() {
+        assertEquals(java.time.Duration.ofMinutes(5), parse("").inviteExpiry());
+    }
+
+    @Test
+    void readsInviteExpiry() {
+        assertEquals(java.time.Duration.ofSeconds(30), parse("invite-expiry: 30s").inviteExpiry());
+        assertEquals(java.time.Duration.ofHours(1), parse("invite-expiry: 1h").inviteExpiry());
+        assertThrows(ConfigException.class, () -> parse("invite-expiry: soon"));
+        assertThrows(ConfigException.class, () -> parse("invite-expiry: 0m"));
+    }
 }

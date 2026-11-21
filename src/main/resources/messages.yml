@@ -9,6 +9,11 @@ command:
   no-permission: "<red>You don't have permission to do that."
   not-a-number: "<red><yellow><input></yellow> is not a whole number."
   not-true-or-false: "<red><yellow><input></yellow> must be true or false."
+  players-only: "<red>Only players can do that."
+  you-have-no-character: "<red>You need to be playing a character first."
+  unknown-player: "<red>There is no player called <yellow><player></yellow>."
+  no-active-character: "<red><yellow><player></yellow> isn't playing a character. Name the profile too."
+  unknown-character: "<red><yellow><player></yellow> has no character called <yellow><profile></yellow>."
   region-needs-world: "<red>From the console, write the world too: <yellow>world:<region></yellow>."
 
 claim:
@@ -25,7 +30,46 @@ claim:
   max-owners-below-owners: "<red><yellow><claim></yellow> already has <owners> owners, so it needs at least that many slots."
   blank-name: "<red>The name can't be empty."
 
+ownership:
+  ok: "<green><character> can own <claim>."
+  type-limit: "<red><character> already owns as many <type> Claims as allowed."
+  full: "<red><claim> has no free owner slot."
+  already-owner: "<red><character> already owns <claim>."
+  unknown-character: "<red>SkysongStats has no character called <character>."
+  not-free: "<red><claim> is not a Free Claim, so it can't be taken."
+  not-owner: "<red>You don't own <claim>."
+  no-invite: "<red>You have no Claim invite waiting."
+  which-invite: "<red>You have several invites: <claims>. Name the one you mean."
+
+player:
+  not-in-claim: "<red>You aren't standing in a Claim."
+  taken: "<green>You now live in <reset><name></reset><green>. <open> slot(s) left."
+  invited: "<green>Invited <character> to co-own <claim>."
+  invite-received: "<gold><inviter></gold> <yellow>invited your character <profile> to co-own <reset><name></reset><yellow>. Type <white>/sclaim accept <claim></white> or <white>/sclaim deny <claim></white> within <minutes> minute(s)."
+  accepted: "<green>You now co-own <reset><name></reset><green>."
+  denied: "<gray>You turned down the invite to <claim>."
+  leave-confirm: "<yellow>Leave <reset><name></reset><yellow>? The other owners keep it. Type <white>/sclaim leave <claim> confirm</white>."
+  leave-confirm-last: "<yellow>Leave <reset><name></reset><yellow>? You are its last owner, so nobody will own it and its groups are cleared. Type <white>/sclaim leave <claim> confirm</white>."
+  left: "<green>You no longer own <reset><name></reset><green>."
+  info:
+    header: "<gold><name></gold> <gray>(<type_name><gray>)"
+    owners: "<gray>Owned by: <white><owners>"
+    no-owners: "<gray>Owned by: <white>nobody"
+    free-open: "<green>Free Claim: <open> of <slots> slot(s) open. Type /sclaim take to move in."
+    free-full: "<gray>Free Claim: all <slots> slot(s) taken."
+    for-sale: "<yellow>For sale."
+  list:
+    header: "<gold>Your character owns <count> Claim(s):"
+    none: "<gray>Your character owns no Claims."
+    line: "<gray>- <reset><name></reset> <gray>(<claim>)"
+    limit: "<gray><type_name><gray>: <white><count> of <limit></white> for this character"
+    limit-account: "<gray><type_name><gray>: <white><count> of <limit></white> for all your characters"
+
 claims:
+  owner-added: "<green><character> now owns <yellow><claim></yellow>."
+  owner-removed: "<green><character> no longer owns <yellow><claim></yellow>."
+  player-not-owner: "<red>No character of <player> owns <claim>."
+  which-profile: "<red>Several characters of <player> own it. Name the profile too."
   created: "<green>Made the Claim <yellow><claim></yellow> (<type>) from <regions> region(s)."
   created-free: "<green>Made the Free Claim <yellow><claim></yellow> (<type>) from <regions> region(s), with <slots> slot(s)."
   delete-confirm: "<yellow>This deletes <claim>, its <owners> owner(s) and its groups. The WorldGuard regions stay. Type <white>/sclaims delete <claim> confirm</white> to go ahead."

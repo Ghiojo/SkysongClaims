@@ -8,10 +8,12 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.skysongdev.skysongClaims.claim.ClaimRegion;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +30,20 @@ public final class WorldGuardRegions implements RegionGateway {
     @Override
     public List<String> regionIds(String world) {
         return manager(world).map(manager -> manager.getRegions().keySet().stream().sorted().toList()).orElse(List.of());
+    }
+
+    @Override
+    public List<ClaimRegion> regionsAt(Location location) {
+        World world = location.getWorld();
+        if (world == null) {
+            return List.of();
+        }
+        return manager(world.getName())
+                .map(manager -> manager.getApplicableRegions(BukkitAdapter.asBlockVector(location)).getRegions().stream()
+                        .sorted(Comparator.comparingInt(ProtectedRegion::getPriority).reversed())
+                        .map(region -> new ClaimRegion(world.getName(), region.getId()))
+                        .toList())
+                .orElse(List.of());
     }
 
     @Override

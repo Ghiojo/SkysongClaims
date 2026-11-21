@@ -12,3 +12,6 @@ database:
 # or per account (all of a player's characters share one count). A type in types.yml can
 # override it with its own limit-per.
 limit-per: character
+
+# How long a co-owner invite waits for /sclaim accept, e.g. 30s, 5m or 1h.
+invite-expiry: 5m
