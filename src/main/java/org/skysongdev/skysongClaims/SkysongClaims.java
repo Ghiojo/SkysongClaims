@@ -26,6 +26,7 @@ import org.skysongdev.skysongClaims.config.ConfigHolder;
 import org.skysongdev.skysongClaims.config.ConfigLoader;
 import org.skysongdev.skysongClaims.config.ConfigSection;
 import org.skysongdev.skysongClaims.config.YamlFiles;
+import org.skysongdev.skysongClaims.group.GroupService;
 import org.skysongdev.skysongClaims.limit.LimitRules;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.Messenger;
@@ -100,8 +101,9 @@ public final class SkysongClaims extends JavaPlugin {
         InviteService invites = new InviteService(store, ownership, () -> config.current().settings().inviteExpiry(),
                 Clock.systemUTC());
         CharacterArguments characterArguments = new CharacterArguments(characters);
+        GroupService groups = new GroupService(store, () -> config.current().settings().groupLimits());
         registerCommand("sclaim", new PlayerCommand(new PlayerSupport(state, new ClaimLocator(state, regions), ownership,
-                invites, limits, types, characterArguments, messenger)));
+                invites, limits, types, characterArguments, messenger), groups));
 
         StaffSupport staff = new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions),
                 characterArguments, messenger);

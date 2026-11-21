@@ -17,6 +17,8 @@ import org.skysongdev.skysongClaims.claim.ClaimStore;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
 import org.skysongdev.skysongClaims.commands.player.PlayerCommand;
 import org.skysongdev.skysongClaims.commands.player.PlayerSupport;
+import org.skysongdev.skysongClaims.group.GroupLimits;
+import org.skysongdev.skysongClaims.group.GroupService;
 import org.skysongdev.skysongClaims.limit.LimitRules;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.ownership.InviteService;
@@ -69,7 +71,8 @@ class PlayerCommandTest {
         OwnershipService ownership = new OwnershipService(store, TestTypes::registry, limits, characters, clock);
         InviteService invites = new InviteService(store, ownership, () -> Duration.ofMinutes(5), clock);
         command = new PlayerCommand(new PlayerSupport(state, new ClaimLocator(state, regions), ownership, invites, limits,
-                TestTypes::registry, new CharacterArguments(characters), TestMessages.messenger()));
+                TestTypes::registry, new CharacterArguments(characters), TestMessages.messenger()),
+                new GroupService(store, () -> new GroupLimits(5, 0)));
     }
 
     @AfterEach
@@ -178,5 +181,24 @@ class PlayerCommandTest {
         assertTrue(said.get(1).contains("Rose Hovel"), said.toString());
         assertEquals("Hovel: 1 of 1 for this character", said.get(2).substring(said.get(2).indexOf("Hovel")), said.toString());
         assertTrue(said.get(3).contains("Other: 0 of 3"), said.toString());
+    }
+
+    @Test
+    void ownersManageBuildGroups() {
+        run(alicePlayer, "take");
+
+        assertTrue(run(alicePlayer, "group hovel_1 create Family").get(0).contains("Made the group family"));
+        assertTrue(run(alicePlayer, "group hovel_1 add family Bob").get(0).contains("Bob can now build"));
+        assertTrue(store.require("hovel_1").group("family").orElseThrow().members().contains(bob));
+        assertTrue(run(alicePlayer, "group hovel_1 list").get(0).contains("Family (family): Bob"));
+        assertTrue(run(alicePlayer, "group hovel_1 remove family Bob").get(0).contains("Bob is no longer in family"));
+        assertTrue(run(alicePlayer, "group hovel_1 add family Alice").get(0).contains("already build"));
+        assertTrue(run(alicePlayer, "group hovel_1 delete family").get(0).contains("Deleted the group family"));
+    }
+
+    @Test
+    void onlyOwnersManageGroups() {
+        assertTrue(run(bobPlayer, "group hovel_1 create Family").get(0).contains("You don't own hovel_1"));
+        assertTrue(run(bobPlayer, "group hovel_1 fly").get(0).contains("Usage"));
     }
 }
