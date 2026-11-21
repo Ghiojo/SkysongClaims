@@ -153,12 +153,14 @@ class StaffCommandTest {
     }
 
     @Test
-    void freeAndMaxOwnersChangeSlots() {
+    void freeSetsAndChangesSlots() {
         run(staff, "create a other hovel_1");
 
+        assertTrue(run(staff, "free a true").get(0).contains("Say how many slots"));
         assertTrue(run(staff, "free a true 3").get(0).contains("Free Claim with 3 slot(s)"));
-        assertTrue(run(staff, "maxowners a 4").get(0).contains("room for 4"));
-        assertTrue(run(staff, "maxowners a lots").get(0).contains("not a whole number"));
+        assertTrue(run(staff, "free a true 4").get(0).contains("Free Claim with 4 slot(s)"));
+        assertTrue(run(staff, "free a true lots").get(0).contains("not a whole number"));
+        assertTrue(run(staff, "free a false").get(0).contains("as many co-owners as they like"));
         assertTrue(run(staff, "free a maybe").get(0).contains("true or false"));
     }
 

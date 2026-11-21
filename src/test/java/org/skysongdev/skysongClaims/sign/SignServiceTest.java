@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,9 +47,9 @@ class SignServiceTest {
         signs = new SignService(state, repository, blocks, new SignText(TestMessages.messenger(), TestTypes::registry), log::add);
         signs.listen((sign, linked) -> heard.add((linked ? "+" : "-") + sign.location()));
         store.observe(signs);
-        store.save(Claim.create("hovel_1", "hovel", true, 2, List.of(new ClaimRegion("world", "hovel_1")))
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_1")))
                 .withDisplayName("<gold>Rose Hovel"), ChangeCause.COMMAND);
-        store.save(Claim.create("house", "other", false, 1, List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
     }
 
     private static List<ClaimOwner> owners(CharacterId... characters) {

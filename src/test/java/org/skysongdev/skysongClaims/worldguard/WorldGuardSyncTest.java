@@ -21,6 +21,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ class WorldGuardSyncTest {
     }
 
     private Claim house(List<ClaimOwner> owners, List<ClaimGroup> groups) {
-        return Claim.create("house", "other", false, 2,
+        return Claim.create("house", "other", OptionalInt.empty(),
                 List.of(new ClaimRegion("world", "house"), new ClaimRegion("world", "garden")))
                 .withOwners(owners).withGroups(groups);
     }
@@ -136,7 +137,7 @@ class WorldGuardSyncTest {
 
     @Test
     void aClaimWithARemovedTypeKeepsTheStandardOpenUse() {
-        store.save(Claim.create("old", "castle", false, 1, List.of(new ClaimRegion("world", "shed"))), ChangeCause.COMMAND);
+        store.save(Claim.create("old", "castle", OptionalInt.empty(), List.of(new ClaimRegion("world", "shed"))), ChangeCause.COMMAND);
 
         assertEquals(ClaimTypesParser.DEFAULT_OPEN_USE, regions.applied("world", "shed").openUse());
     }

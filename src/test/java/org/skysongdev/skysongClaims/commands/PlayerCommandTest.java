@@ -34,6 +34,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,9 +63,9 @@ class PlayerCommandTest {
         bob = characters.play(bobPlayer.getUniqueId(), "Bob");
         ClaimState state = new ClaimState();
         store = new ClaimStore(state, new InMemoryClaimRepository());
-        store.save(Claim.create("hovel_1", "hovel", true, 2, List.of(HOVEL)).withDisplayName("<gold>Rose Hovel"),
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(HOVEL)).withDisplayName("<gold>Rose Hovel"),
                 ChangeCause.COMMAND);
-        store.save(Claim.create("house", "other", false, 2, List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
         regions = new FakeRegions().add("world", "hovel_1", "house").standingIn(HOVEL);
         MutableClock clock = new MutableClock();
         Limits limits = new Limits(state, new LimitRules((what, e) -> {

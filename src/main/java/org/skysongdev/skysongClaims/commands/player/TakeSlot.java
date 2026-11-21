@@ -22,6 +22,6 @@ final class TakeSlot extends LeafCommand {
         CharacterId character = support.characters().own(sender);
         Claim claim = support.ownership().take(character, support.claimHere(sender).id());
         messenger.send(sender, "player.taken", unparsed("claim", claim.id()), parsed("name", claim.displayName()),
-                unparsed("open", Integer.toString(claim.openSlots())));
+                unparsed("open", Integer.toString(claim.openSlots().orElseThrow())));
     }
 }

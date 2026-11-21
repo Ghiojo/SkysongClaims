@@ -8,6 +8,7 @@ import org.skysongdev.skysongClaims.messaging.RefusedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,7 +20,7 @@ class ClaimStoreTest {
     private final List<ClaimChange> changes = new ArrayList<>();
 
     private static Claim claim(String name) {
-        return Claim.create("a", "other", false, 1, List.of(new ClaimRegion("world", "a"))).withDisplayName(name);
+        return Claim.create("a", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "a"))).withDisplayName(name);
     }
 
     @Test

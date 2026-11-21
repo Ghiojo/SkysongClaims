@@ -55,25 +55,22 @@ class ClaimTypesParserTest {
     }
 
     @Test
-    void aTypeWithoutFreeClaimIsBoughtAndHasOneOwnerByDefault() {
+    void aTypeWithoutFreeClaimIsBoughtWithNoCapOnOwners() {
         ClaimType other = only("types: { other: { display-name: Other, limit: 3 } }");
 
         assertFalse(other.freeClaim());
         assertEquals(OptionalInt.empty(), other.freeClaimSlots());
-        assertEquals(1, other.maxOwners());
+        assertTrue(warnings.isEmpty());
     }
 
     @Test
-    void readsMaxOwnersOfABoughtType() {
-        assertEquals(4, only("types: { manor: { display-name: Manor, limit: 1, max-owners: 4 } }").maxOwners());
-    }
-
-    @Test
-    void maxOwnersOnAFreeTypeIsIgnoredWithAWarning() {
+    void maxOwnersIsIgnoredWithAWarning() {
+        assertEquals(OptionalInt.empty(),
+                only("types: { manor: { display-name: Manor, limit: 1, max-owners: 4 } }").freeClaimSlots());
         ClaimType hovel = only("types: { hovel: { display-name: H, limit: 1, max-owners: 5, free-claim: { default-max-owners: 2 } } }");
 
-        assertEquals(2, hovel.maxOwners());
-        assertEquals(1, warnings.size());
+        assertEquals(OptionalInt.of(2), hovel.freeClaimSlots());
+        assertEquals(2, warnings.size());
     }
 
     @Test
@@ -136,7 +133,6 @@ class ClaimTypesParserTest {
         assertRefused("types: { a: { display-name: A } }", "limit");
         assertRefused("types: { a: { display-name: A, limit: -1 } }", "limit");
         assertRefused("types: { a: { display-name: A, limit: 1, limit-per: guild } }", "limit-per");
-        assertRefused("types: { a: { display-name: A, limit: 1, max-owners: 0 } }", "max-owners");
         assertRefused("types: { a: { display-name: A, limit: 1, free-claim: { default-max-owners: 0 } } }", "default-max-owners");
         assertRefused("types: { a: { display-name: A, limit: 1, extra: [x] } }", "extra");
     }

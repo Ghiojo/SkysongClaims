@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -27,9 +28,9 @@ import java.util.regex.Pattern;
  *   other:
  *     display-name: "Other"
  *     limit: 3
- *     max-owners: 1                  # owners a new non-free Claim has room for, 1 when left out
  * }</pre>
- * A type with a {@code free-claim} section makes new Claims that players take themselves.
+ * A type with a {@code free-claim} section makes new Claims that players take themselves, one
+ * slot each. Claims of other types are bought or given by staff and have no cap on owners.
  */
 public final class ClaimTypesParser {
     /** File name in the data folder and in the jar. */
@@ -79,14 +80,15 @@ public final class ClaimTypesParser {
         int limit = nonNegative(section, "limit", requiredInteger(section, "limit"));
         LimitScope scope = scope(section);
         boolean free = section.contains("free-claim");
-        int maxOwners = free
-                ? atLeastOne(section.section("free-claim"), "default-max-owners",
-                        section.section("free-claim").integer("default-max-owners", 1))
-                : atLeastOne(section, "max-owners", section.integer("max-owners", 1));
-        if (free && section.contains("max-owners")) {
-            warnings.accept(section.path() + ".max-owners is ignored on a Free Claim type: set free-claim.default-max-owners");
+        OptionalInt slots = free
+                ? OptionalInt.of(atLeastOne(section.section("free-claim"), "default-max-owners",
+                        section.section("free-claim").integer("default-max-owners", 1)))
+                : OptionalInt.empty();
+        if (section.contains("max-owners")) {
+            warnings.accept(section.path() + ".max-owners is ignored: bought Claims have no cap on owners, "
+                    + "and a Free Claim type sets its slots with free-claim.default-max-owners");
         }
-        return new ClaimType(id, displayName, limit, scope, maxOwners, free, openUse(section),
+        return new ClaimType(id, displayName, limit, scope, slots, openUse(section),
                 section.plainSection("extra"));
     }
 

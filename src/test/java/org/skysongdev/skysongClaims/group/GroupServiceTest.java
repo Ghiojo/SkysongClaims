@@ -17,6 +17,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,7 +38,7 @@ class GroupServiceTest {
 
     @BeforeEach
     void setUp() {
-        store.save(Claim.create("house", "other", false, 2, List.of(new ClaimRegion("world", "house")))
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house")))
                 .withOwners(List.of(new ClaimOwner(ALICE, Instant.EPOCH, OwnerCause.STAFF))), ChangeCause.COMMAND);
     }
 

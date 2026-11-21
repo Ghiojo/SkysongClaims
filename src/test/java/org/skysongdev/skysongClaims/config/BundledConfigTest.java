@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,7 +45,7 @@ class BundledConfigTest {
         assertEquals(LimitScope.CHARACTER, config.settings().defaultLimitScope());
         ClaimType hovel = config.types().find("hovel").orElseThrow();
         assertTrue(hovel.freeClaim());
-        assertEquals(2, hovel.maxOwners());
+        assertEquals(OptionalInt.of(2), hovel.freeClaimSlots());
         assertEquals(ClaimTypesParser.DEFAULT_OPEN_USE, hovel.openUse());
         assertEquals(3, config.types().find("other").orElseThrow().limit());
         assertTrue(Files.exists(dataFolder.resolve("types.yml")), "missing files are created");

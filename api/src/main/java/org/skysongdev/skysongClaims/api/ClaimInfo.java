@@ -6,6 +6,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * A Claim as it was when it was read: a group of WorldGuard regions owned together. It doesn't
@@ -14,8 +15,8 @@ import java.util.Optional;
  * @param id          the name staff gave it, lower case
  * @param displayName the name shown to players, in MiniMessage
  * @param typeId      the id of its type in {@code types.yml}
- * @param free        whether players take it themselves, one slot each
- * @param maxOwners   how many owners it has room for
+ * @param slots       how many owners a Free Claim has room for, each taking one slot themselves;
+ *                    empty for a bought Claim, which has no cap on owners
  * @param regions     its WorldGuard regions
  * @param owners      its owners, in the order they joined
  * @param forSaleBy   the plugin that put it on sale, empty when it isn't for sale
@@ -24,8 +25,7 @@ public record ClaimInfo(
         @NotNull String id,
         @NotNull String displayName,
         @NotNull String typeId,
-        boolean free,
-        int maxOwners,
+        @NotNull OptionalInt slots,
         @NotNull List<ClaimRegion> regions,
         @NotNull List<ClaimOwner> owners,
         @NotNull Optional<String> forSaleBy) {
@@ -34,6 +34,7 @@ public record ClaimInfo(
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(displayName, "displayName");
         Objects.requireNonNull(typeId, "typeId");
+        Objects.requireNonNull(slots, "slots");
         regions = List.copyOf(regions);
         owners = List.copyOf(owners);
         Objects.requireNonNull(forSaleBy, "forSaleBy");
@@ -51,8 +52,18 @@ public record ClaimInfo(
         return forSaleBy.isPresent();
     }
 
-    /** @return how many more owners it has room for */
-    public int openSlots() {
-        return Math.max(0, maxOwners - owners.size());
+    /** @return whether players take it themselves, one slot each */
+    public boolean free() {
+        return slots.isPresent();
+    }
+
+    /** @return how many slots of a Free Claim are open; empty for a bought Claim */
+    public @NotNull OptionalInt openSlots() {
+        return slots.isPresent() ? OptionalInt.of(Math.max(0, slots.getAsInt() - owners.size())) : OptionalInt.empty();
+    }
+
+    /** @return whether one more owner fits: always for a bought Claim, while a slot is open for a Free Claim */
+    public boolean hasRoom() {
+        return slots.isEmpty() || owners.size() < slots.getAsInt();
     }
 }

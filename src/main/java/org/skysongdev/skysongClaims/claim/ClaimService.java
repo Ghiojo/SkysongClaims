@@ -52,7 +52,7 @@ public final class ClaimService {
             throw RefusedException.of("claim.no-regions", "claim", id);
         }
         claimRegions.forEach(region -> requireFreeRegion(region, id));
-        Claim claim = Claim.create(id, type.id(), type.freeClaim(), type.maxOwners(), claimRegions);
+        Claim claim = Claim.create(id, type.id(), type.freeClaimSlots(), claimRegions);
         store.save(claim, cause);
         return claim;
     }
@@ -101,27 +101,24 @@ public final class ClaimService {
     }
 
     /**
-     * Makes the Claim a Free Claim or not, and optionally changes its owner slots.
+     * Makes the Claim a Free Claim with that many slots, or changes the slots of one.
      *
-     * @param maxOwners the new number of slots, or empty to keep the current one
-     * @throws RefusedException when the slots are fewer than 1 or than its current owners
+     * @param slots the slots, or empty to keep a Free Claim's own or use its type's
+     * @throws RefusedException when no slots are given and none can be found, or they are fewer
+     *                          than 1 or than its current owners
      */
-    public Claim setFree(String id, boolean free, OptionalInt maxOwners, ChangeCause cause) {
+    public Claim makeFree(String id, OptionalInt slots, ChangeCause cause) {
         Claim claim = store.require(id);
-        int slots = maxOwners.orElse(claim.maxOwners());
-        requireSlots(claim, slots);
-        return save(claim.withFree(free, slots), cause);
+        int count = firstPresent(slots, claim.slots(),
+                types.get().find(claim.typeId()).map(ClaimType::freeClaimSlots).orElse(OptionalInt.empty()))
+                .orElseThrow(() -> RefusedException.of("claim.slots-needed", "claim", claim.id()));
+        requireSlots(claim, count);
+        return save(claim.withSlots(OptionalInt.of(count)), cause);
     }
 
-    /**
-     * Changes how many owners the Claim has room for.
-     *
-     * @throws RefusedException when it is fewer than 1 or than its current owners
-     */
-    public Claim setMaxOwners(String id, int maxOwners, ChangeCause cause) {
-        Claim claim = store.require(id);
-        requireSlots(claim, maxOwners);
-        return save(claim.withFree(claim.free(), maxOwners), cause);
+    /** Makes the Claim a bought Claim, with no cap on owners. */
+    public Claim makeBought(String id, ChangeCause cause) {
+        return save(store.require(id).withSlots(OptionalInt.empty()), cause);
     }
 
     /** @throws RefusedException when the name is blank */
@@ -169,12 +166,21 @@ public final class ClaimService {
         });
     }
 
+    private static OptionalInt firstPresent(OptionalInt... choices) {
+        for (OptionalInt choice : choices) {
+            if (choice.isPresent()) {
+                return choice;
+            }
+        }
+        return OptionalInt.empty();
+    }
+
     private static void requireSlots(Claim claim, int slots) {
         if (slots < 1) {
-            throw RefusedException.of("claim.max-owners-too-low", "claim", claim.id());
+            throw RefusedException.of("claim.slots-too-low", "claim", claim.id());
         }
         if (slots < claim.owners().size()) {
-            throw RefusedException.of("claim.max-owners-below-owners", "claim", claim.id(),
+            throw RefusedException.of("claim.slots-below-owners", "claim", claim.id(),
                     "owners", Integer.toString(claim.owners().size()));
         }
     }

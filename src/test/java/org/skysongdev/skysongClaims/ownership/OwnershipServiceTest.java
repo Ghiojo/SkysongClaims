@@ -22,6 +22,7 @@ import org.skysongdev.skysongClaims.support.TestTypes;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,9 +48,9 @@ class OwnershipServiceTest {
         alice = characters.play(UUID.randomUUID(), "Alice");
         bob = characters.play(UUID.randomUUID(), "Bob");
         carol = characters.play(UUID.randomUUID(), "Carol");
-        store.save(Claim.create("hovel_1", "hovel", true, 2, List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
-        store.save(Claim.create("hovel_2", "hovel", true, 2, List.of(new ClaimRegion("world", "hovel_2"))), ChangeCause.COMMAND);
-        store.save(Claim.create("house", "other", false, 1, List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
+        store.save(Claim.create("hovel_1", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_1"))), ChangeCause.COMMAND);
+        store.save(Claim.create("hovel_2", "hovel", OptionalInt.of(2), List.of(new ClaimRegion("world", "hovel_2"))), ChangeCause.COMMAND);
+        store.save(Claim.create("house", "other", OptionalInt.empty(), List.of(new ClaimRegion("world", "house"))), ChangeCause.COMMAND);
     }
 
     private static String refusal(org.junit.jupiter.api.function.Executable action) {
@@ -100,9 +101,9 @@ class OwnershipServiceTest {
         Claim forced = ownership.addOwner("hovel_2", alice, OwnerCause.STAFF, ChangeCause.COMMAND, true);
         assertTrue(forced.isOwnedBy(alice));
 
-        ownership.addOwner("house", bob, OwnerCause.STAFF, ChangeCause.COMMAND, false);
+        ownership.take(bob, "hovel_2");
         assertEquals("ownership.full",
-                refusal(() -> ownership.addOwner("house", carol, OwnerCause.STAFF, ChangeCause.COMMAND, true)));
+                refusal(() -> ownership.addOwner("hovel_2", carol, OwnerCause.STAFF, ChangeCause.COMMAND, true)));
     }
 
     @Test
@@ -117,7 +118,7 @@ class OwnershipServiceTest {
         assertFalse(left.isOwnedBy(alice));
         assertTrue(left.isOwnedBy(bob));
         assertEquals(1, left.groups().size());
-        assertEquals(1, left.openSlots());
+        assertEquals(OptionalInt.of(1), left.openSlots());
     }
 
     @Test
@@ -130,7 +131,7 @@ class OwnershipServiceTest {
 
         assertFalse(left.isOwned());
         assertTrue(left.groups().isEmpty());
-        assertEquals(2, left.openSlots());
+        assertEquals(OptionalInt.of(2), left.openSlots());
         assertEquals("ownership.not-owner", refusal(() -> ownership.removeOwner("hovel_1", alice, ChangeCause.COMMAND)));
     }
 

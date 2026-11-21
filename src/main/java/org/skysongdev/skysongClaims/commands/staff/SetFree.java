@@ -12,14 +12,14 @@ import java.util.OptionalInt;
 import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.unparsed;
 
 /**
- * {@code /sclaims free <id> <true|false> [max-owners]}: makes a Claim a Free Claim that players
- * take themselves, or not, and optionally sets its owner slots.
+ * {@code /sclaims free <id> <true|false> [slots]}: makes a Claim a Free Claim that players
+ * take themselves with that many slots (or changes the slots of one), or a bought Claim with no cap on owners.
  */
 final class SetFree extends LeafCommand {
     private final StaffSupport support;
 
     SetFree(StaffSupport support) {
-        super(support.messenger(), "free", "<id> <true|false> [max-owners]", 2, null);
+        super(support.messenger(), "free", "<id> <true|false> [slots]", 2, null);
         this.support = support;
     }
 
@@ -31,9 +31,14 @@ final class SetFree extends LeafCommand {
             default -> throw RefusedException.of("command.not-true-or-false", "input", args[1]);
         };
         OptionalInt slots = args.length > 2 ? OptionalInt.of(Numbers.parse(args[2])) : OptionalInt.empty();
-        Claim claim = support.claims().setFree(args[0], free, slots, ChangeCause.COMMAND);
-        messenger.send(sender, free ? "claims.free-on" : "claims.free-off", unparsed("claim", claim.id()),
-                unparsed("slots", Integer.toString(claim.maxOwners())));
+        if (free) {
+            Claim claim = support.claims().makeFree(args[0], slots, ChangeCause.COMMAND);
+            messenger.send(sender, "claims.free-on", unparsed("claim", claim.id()),
+                    unparsed("slots", Integer.toString(claim.slots().orElseThrow())));
+        } else {
+            Claim claim = support.claims().makeBought(args[0], ChangeCause.COMMAND);
+            messenger.send(sender, "claims.free-off", unparsed("claim", claim.id()));
+        }
     }
 
     @Override

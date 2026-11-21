@@ -39,9 +39,9 @@ public final class SignText {
 
     private Component status(Claim claim) {
         if (claim.free()) {
-            return claim.openSlots() > 0
-                    ? messenger.render("signs.free-open", unparsed("open", Integer.toString(claim.openSlots())),
-                            unparsed("slots", Integer.toString(claim.maxOwners())))
+            return claim.hasRoom()
+                    ? messenger.render("signs.free-open", unparsed("open", Integer.toString(claim.openSlots().orElseThrow())),
+                            unparsed("slots", Integer.toString(claim.slots().orElseThrow())))
                     : messenger.render("signs.free-full");
         }
         if (claim.isForSale()) {

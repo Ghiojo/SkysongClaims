@@ -36,7 +36,7 @@ Staff draw WorldGuard regions as usual. They then group one or more regions into
 
 - Every Claim has a **type** from `types.yml`, such as Hovel or Other. The type sets how many Claims of it one character may own.
 - Claims are owned by **SkysongStats characters (profiles)**, not by player accounts. A player who switches to another character loses the rights of the first one at once.
-- A Claim can have several **owners**. Owners can never remove each other. Only staff can, or an owner leaves on their own.
+- A Claim can have several **owners**. A bought Claim has no cap on owners, and a Free Claim has a fixed number of slots. Owners can never remove each other. Only staff can, or an owner leaves on their own.
 - **Free Claims**, such as hovels, are taken by players themselves, one slot each, with `/sclaim take` or from the Claim's sign.
 - Other Claims are given out by staff, or sold by SkysongEconomy through the API.
 - Owners can make **build groups**, which let other characters build. Nobody can lock doors or chests. Those are open to everyone in every Claim, and theft is handled by lock items.
@@ -143,12 +143,11 @@ The key (`hovel`, `other`) is the type's id. Use up to 32 lower case letters, di
 | `display-name` | Required. The name players see, in MiniMessage. |
 | `limit` | Required. How many Claims of this type one character (or account) may own. Other plugins can raise it for some players through the API. |
 | `limit-per` | `character` or `account`. When it is left out, `config.yml`'s `limit-per` is used. |
-| `free-claim` | Makes new Claims of this type Free Claims, with `default-max-owners` slots (1 when left out). |
-| `max-owners` | For types that aren't Free Claims: how many owners a new Claim has room for. It is 1 when left out. It is ignored on a Free Claim type, with a warning. |
+| `free-claim` | Makes new Claims of this type Free Claims, with `default-max-owners` slots (1 when left out). Claims of types without it are bought or given by staff, and have **no cap on owners**: their owners may invite as many co-owners as they like. |
 | `open-use` | The WorldGuard flags set to `allow` for everyone in the Claim's regions. When left out, it uses the list shown above. `build` is never allowed here. Animals keep WorldGuard's default. |
 | `extra` | Free settings that other plugins read, such as SkysongEconomy price modifiers. SkysongClaims doesn't use them. |
 
-A type's `free-claim` and `max-owners` only set the **starting** values of a new Claim. Staff can change any single Claim afterwards with `/sclaims free` and `/sclaims maxowners`.
+A type's `free-claim` only sets the **starting** value of a new Claim. Staff can change any single Claim afterwards with `/sclaims free`. An old `max-owners:` line is ignored, with a warning in the console.
 
 If you remove a type that Claims still use, those Claims keep working. Their owners keep them, no one can take new ones (the limit counts as 0), and their regions keep the standard open-use flags, so chests never lock. They are listed in the console at start-up and after every reload. Give them a new type with `/sclaims settype`.
 
@@ -192,9 +191,11 @@ Placeholders such as `<claim>` and `<character>` are filled in as plain text. Na
 | How | Who | Checks |
 |---|---|---|
 | `/sclaim take` or the sign menu's **Take slot** | A player, on a Free Claim | A slot is open, and the type's limit isn't reached. |
-| `/sclaim invite`, then `/sclaim accept` | An owner invites, the invitee accepts | The same checks, at invite time and again at accept time. |
-| `/sclaims addowner` | Staff | Slots. `-force` skips the type limit. |
-| The API | SkysongEconomy, for example on a sale | Slots and limit. |
+| `/sclaim invite`, then `/sclaim accept` | An owner invites, the invitee accepts | The type's limit, and on a Free Claim an open slot. Checked at invite time and again at accept time. |
+| `/sclaims addowner` | Staff | On a Free Claim, an open slot. `-force` skips the type limit. |
+| The API | SkysongEconomy, for example on a sale | The type's limit, and on a Free Claim an open slot. |
+
+Only Free Claims have slots. A bought Claim has no cap on owners, so its owners can invite as many co-owners as they like.
 
 - **Limits** count the Claims of a type a character owns (or an account owns, with `limit-per: account`). A shared Claim counts once for each owner. Other plugins can add live bonuses through the API, for example "+1 hovel while they have the Noble rank". Nothing is saved for bonuses.
 - Someone **over their limit** (for example after a bonus ended, or after `/sclaims settype`) keeps what they own but can't take more.
@@ -295,8 +296,8 @@ SkysongStats doesn't announce deleted profiles. So at start-up, and with `/sclai
 | `/sclaims addregion <id> <[world:]region>` | Add a region. |
 | `/sclaims removeregion <id> <[world:]region>` | Take a region out. |
 | `/sclaims settype <id> <type>` | Change the type. Owners keep it even if that puts them over the new limit. |
-| `/sclaims free <id> <true\|false> [max-owners]` | Make it a Free Claim or not, optionally with its slots. |
-| `/sclaims maxowners <id> <number>` | Set its owner slots. It can't go below the current number of owners. |
+| `/sclaims free <id> true [slots]` | Make it a Free Claim, or change a Free Claim's slots. Without a number, it keeps a Free Claim's slots or uses its type's. Slots can't go below the current number of owners. |
+| `/sclaims free <id> false` | Make it a bought Claim, with no cap on owners. |
 | `/sclaims rename <id> <name...>` | The name players see, in MiniMessage. |
 | `/sclaims addowner <id> <player> [profile] [-force]` | Add an owner. `-force` skips the type limit. |
 | `/sclaims removeowner <id> <player> [profile]` | Remove an owner. |
@@ -333,7 +334,7 @@ All tables are created at start-up if they are missing.
 
 | Table | Holds |
 |---|---|
-| `claims` | One row per Claim: id, display name, type, Free Claim or not, owner slots, and the plugin that put it on sale. |
+| `claims` | One row per Claim: id, display name, type, its slots (empty for a bought Claim) and the plugin that put it on sale. |
 | `claim_regions` | The Claim's regions (world and region id). A region can be in only one Claim. |
 | `claim_owners` | Owners as player UUID and profile, since when, and how they became an owner (staff, Free Claim, invite, API). |
 | `claim_groups` / `claim_group_members` | Build groups and their characters. |
@@ -353,7 +354,7 @@ Add a section under `types:` in `types.yml` with at least `display-name` and `li
 Give it `free-claim: { default-max-owners: <slots> }`. This only affects new Claims. Existing ones change with `/sclaims free <id> true <slots>`.
 
 ### Let two characters own a bought house
-Run `/sclaims maxowners <id> 2`, or set `max-owners: 2` on the type for new Claims.
+Nothing to do: one owner invites the other with `/sclaim invite`. Bought Claims have no cap on owners.
 
 ### Count limits per player instead of per character
 Set `limit-per: account` in `config.yml`, or on one type in `types.yml`.

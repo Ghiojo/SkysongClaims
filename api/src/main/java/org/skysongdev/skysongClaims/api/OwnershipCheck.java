@@ -6,7 +6,7 @@ public enum OwnershipCheck {
     OK,
     /** It already owns as many Claims of the type as its limit allows. */
     TYPE_LIMIT,
-    /** Every owner slot of the Claim is taken. */
+    /** Every slot of the Free Claim is taken. Bought Claims have no cap, so they are never full. */
     FULL,
     /** It already owns the Claim. */
     ALREADY_OWNER,

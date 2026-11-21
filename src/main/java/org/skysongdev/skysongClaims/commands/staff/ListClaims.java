@@ -31,9 +31,10 @@ final class ListClaims extends LeafCommand {
         }
         messenger.send(sender, "claims.list.header", unparsed("count", Integer.toString(claims.size())));
         for (Claim claim : claims) {
-            messenger.send(sender, "claims.list.line", unparsed("claim", claim.id()), parsed("name", claim.displayName()),
-                    unparsed("type", claim.typeId()), unparsed("owners", Integer.toString(claim.owners().size())),
-                    unparsed("slots", Integer.toString(claim.maxOwners())));
+            messenger.send(sender, claim.free() ? "claims.list.line-free" : "claims.list.line", unparsed("claim", claim.id()),
+                    parsed("name", claim.displayName()), unparsed("type", claim.typeId()),
+                    unparsed("owners", Integer.toString(claim.owners().size())),
+                    unparsed("slots", Integer.toString(claim.slots().orElse(0))));
         }
     }
 
