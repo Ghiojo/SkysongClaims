@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.config;
 
+import org.skysongdev.skysongClaims.storage.DatabaseSettings;
 import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.util.Objects;
@@ -7,13 +8,15 @@ import java.util.Objects;
 /**
  * The plugin-wide settings of {@code config.yml}.
  *
+ * @param database          where Claims are saved; read once at start-up
  * @param defaultLimitScope whether limits count per character or per account, for types that don't say
  */
-public record PluginSettings(LimitScope defaultLimitScope) {
+public record PluginSettings(DatabaseSettings database, LimitScope defaultLimitScope) {
     /** File name in the data folder and in the jar. */
     public static final String FILE = "config.yml";
 
     public PluginSettings {
+        Objects.requireNonNull(database, "database");
         Objects.requireNonNull(defaultLimitScope, "defaultLimitScope");
     }
 
@@ -22,6 +25,6 @@ public record PluginSettings(LimitScope defaultLimitScope) {
         String raw = root.string("limit-per", LimitScope.CHARACTER.configName());
         LimitScope scope = LimitScope.fromConfig(raw)
                 .orElseThrow(() -> root.error("limit-per", "must be 'character' or 'account', not '" + raw + "'"));
-        return new PluginSettings(scope);
+        return new PluginSettings(DatabaseSettings.parse(root.section("database")), scope);
     }
 }
