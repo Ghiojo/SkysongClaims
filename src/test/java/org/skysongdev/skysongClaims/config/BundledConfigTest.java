@@ -2,6 +2,7 @@ package org.skysongdev.skysongClaims.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.type.ClaimType;
 import org.skysongdev.skysongClaims.type.ClaimTypesParser;
 import org.skysongdev.skysongClaims.type.LimitScope;
@@ -35,7 +36,7 @@ class BundledConfigTest {
     @Test
     void defaultFilesLoadCleanly() {
         List<String> warnings = new ArrayList<>();
-        ConfigLoader loader = new ConfigLoader(new YamlFiles(dataFolder, this::copyFromJar), warnings::add);
+        ConfigLoader loader = new ConfigLoader(new YamlFiles(dataFolder, this::copyFromJar), TestMessages::bundled, warnings::add);
 
         LoadedConfig config = loader.load();
 
@@ -47,5 +48,6 @@ class BundledConfigTest {
         assertEquals(ClaimTypesParser.DEFAULT_OPEN_USE, hovel.openUse());
         assertEquals(3, config.types().find("other").orElseThrow().limit());
         assertTrue(Files.exists(dataFolder.resolve("types.yml")), "missing files are created");
+        assertTrue(config.messages().has("claims.created"));
     }
 }

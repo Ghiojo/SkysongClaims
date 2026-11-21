@@ -1,0 +1,57 @@
+# Every text SkysongClaims shows, in MiniMessage (https://docs.advntr.dev/minimessage/format.html).
+# Words in <angle_brackets> that aren't colours are filled in by the plugin. Missing keys use
+# the plugin's defaults, so this file can hold only the texts you changed.
+prefix: "<dark_gray>[<gold>Claims<dark_gray>] <reset>"
+
+command:
+  usage: "<red>Usage: /<usage>"
+  unknown-subcommand: "<red>Unknown command <yellow><input></yellow>. Usage: /<usage>"
+  no-permission: "<red>You don't have permission to do that."
+  not-a-number: "<red><yellow><input></yellow> is not a whole number."
+  not-true-or-false: "<red><yellow><input></yellow> must be true or false."
+  region-needs-world: "<red>From the console, write the world too: <yellow>world:<region></yellow>."
+
+claim:
+  unknown: "<red>There is no Claim called <yellow><claim></yellow>."
+  invalid-id: "<red><yellow><claim></yellow> can't name a Claim: use up to 32 lower case letters, digits, _ and -."
+  id-taken: "<red>There is already a Claim called <yellow><claim></yellow>."
+  unknown-type: "<red>There is no Claim type called <yellow><type></yellow> in types.yml."
+  no-regions: "<red>A Claim needs at least one region."
+  region-missing: "<red>WorldGuard has no region <yellow><region></yellow>."
+  region-taken: "<red>The region <yellow><region></yellow> already belongs to the Claim <yellow><claim></yellow>."
+  region-not-in-claim: "<red>The region <yellow><region></yellow> is not part of <yellow><claim></yellow>."
+  last-region: "<red>That is the last region of <yellow><claim></yellow>. Delete the Claim instead."
+  max-owners-too-low: "<red>A Claim needs room for at least one owner."
+  max-owners-below-owners: "<red><yellow><claim></yellow> already has <owners> owners, so it needs at least that many slots."
+  blank-name: "<red>The name can't be empty."
+
+claims:
+  created: "<green>Made the Claim <yellow><claim></yellow> (<type>) from <regions> region(s)."
+  created-free: "<green>Made the Free Claim <yellow><claim></yellow> (<type>) from <regions> region(s), with <slots> slot(s)."
+  delete-confirm: "<yellow>This deletes <claim>, its <owners> owner(s) and its groups. The WorldGuard regions stay. Type <white>/sclaims delete <claim> confirm</white> to go ahead."
+  deleted: "<green>Deleted the Claim <yellow><claim></yellow>."
+  region-added: "<green>Added <yellow><region></yellow> to <yellow><claim></yellow>."
+  region-removed: "<green>Removed <yellow><region></yellow> from <yellow><claim></yellow>."
+  type-set: "<green><yellow><claim></yellow> is now a <yellow><type></yellow>."
+  free-on: "<green><yellow><claim></yellow> is now a Free Claim with <slots> slot(s)."
+  free-off: "<green><yellow><claim></yellow> is no longer a Free Claim. It has room for <slots> owner(s)."
+  max-owners-set: "<green><yellow><claim></yellow> now has room for <slots> owner(s)."
+  renamed: "<green><yellow><claim></yellow> is now called <reset><name></reset>."
+  reloaded: "<green>Reloaded SkysongClaims: <types> Claim type(s)."
+  reload-failed: "<red>Nothing was reloaded, because a file has a mistake: <white><error>"
+  unknown-type-warning: "<yellow>The Claim <claim> has the type <type>, which is no longer in types.yml."
+  info:
+    header: "<gold><name></gold> <gray>(<claim>)"
+    type: "<gray>Type: <white><type_name></white> (<type>)"
+    type-unknown: "<gray>Type: <red><type>, not in types.yml"
+    free: "<gray>Free Claim: <white><open> of <slots> slot(s) open"
+    bought: "<gray>Owners: <white><owners> of <slots>"
+    regions: "<gray>Regions: <white><regions>"
+    owners: "<gray>Owned by: <white><owners>"
+    no-owners: "<gray>Owned by: <white>nobody"
+    groups: "<gray>Groups: <white><groups>"
+    for-sale: "<gray>For sale, set by <white><plugin>"
+  list:
+    header: "<gold><count> Claim(s):"
+    line: "<gray>- <yellow><claim></yellow> <reset><name></reset> <gray>(<type>, <owners>/<slots> owners)"
+    empty: "<gray>No Claims."
