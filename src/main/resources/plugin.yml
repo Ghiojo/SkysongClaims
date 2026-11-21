@@ -21,7 +21,7 @@ commands:
     aliases: [sc]
   sclaims:
     description: "Staff commands for Claims"
-    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|addowner|removeowner|info|list|check|reload>"
+    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|addowner|removeowner|sign|unsign|info|list|check|reload>"
     permission: skysongclaims.admin
 
 permissions:

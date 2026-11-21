@@ -60,6 +60,15 @@ public final class DatabaseSchema {
                     + "flag VARCHAR(64) NOT NULL, "
                     + "flag_value VARCHAR(1024) NOT NULL, "
                     + "PRIMARY KEY (claim_id, flag), "
+                    + "FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE) ENGINE=InnoDB",
+            // price_line is the fourth line another plugin set, as Adventure JSON.
+            "CREATE TABLE IF NOT EXISTS claim_signs ("
+                    + "claim_id VARCHAR(32) NOT NULL, "
+                    + "world VARCHAR(128) NOT NULL, "
+                    + "x INT NOT NULL, y INT NOT NULL, z INT NOT NULL, "
+                    + "price_line TEXT NULL, "
+                    + "PRIMARY KEY (world, x, y, z), "
+                    + "INDEX (claim_id), "
                     + "FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE) ENGINE=InnoDB");
 
     private DatabaseSchema() {
