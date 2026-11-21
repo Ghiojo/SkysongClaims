@@ -40,4 +40,12 @@ class PluginSettingsTest {
         assertThrows(ConfigException.class, () -> parse("invite-expiry: soon"));
         assertThrows(ConfigException.class, () -> parse("invite-expiry: 0m"));
     }
+
+    @Test
+    void groupLimitsDefaultToFiveGroupsAndNoMemberLimit() {
+        assertEquals(new org.skysongdev.skysongClaims.group.GroupLimits(5, 0), parse("").groupLimits());
+        assertEquals(new org.skysongdev.skysongClaims.group.GroupLimits(2, 10),
+                parse("{max-groups-per-claim: 2, max-members-per-group: 10}").groupLimits());
+        assertThrows(ConfigException.class, () -> parse("max-groups-per-claim: -1"));
+    }
 }

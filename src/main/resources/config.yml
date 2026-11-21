@@ -15,3 +15,8 @@ limit-per: character
 
 # How long a co-owner invite waits for /sclaim accept, e.g. 30s, 5m or 1h.
 invite-expiry: 5m
+
+# How many build groups the owners of one Claim may make, and how many characters one group
+# may hold. 0 means no limit.
+max-groups-per-claim: 5
+max-members-per-group: 0
