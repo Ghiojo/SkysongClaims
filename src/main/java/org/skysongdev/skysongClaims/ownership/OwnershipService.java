@@ -1,11 +1,12 @@
 package org.skysongdev.skysongClaims.ownership;
 
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.OwnerCause;
+import org.skysongdev.skysongClaims.api.OwnershipCheck;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 import org.skysongdev.skysongClaims.type.ClaimType;
@@ -96,6 +97,53 @@ public final class OwnershipService {
         return changed;
     }
 
+    /**
+     * @return whether {@code to} may take {@code from}'s place as an owner: like {@link #canOwn},
+     *         counting the slot {@code from} frees as open; {@link OwnershipCheck#UNKNOWN_CHARACTER}
+     *         also when {@code from} isn't an owner
+     */
+    public OwnershipCheck canTransfer(Claim claim, CharacterId from, CharacterId to) {
+        if (!claim.isOwnedBy(from)) {
+            return OwnershipCheck.UNKNOWN_CHARACTER;
+        }
+        return canOwn(to, claim.withOwners(withoutOwner(claim, from)));
+    }
+
+    /**
+     * {@code to} takes {@code from}'s place as an owner, keeping the Claim's groups; {@code to}
+     * leaves any group, as owners need none.
+     *
+     * @throws RefusedException when {@link #canTransfer} refuses
+     */
+    public Claim transfer(String claimId, CharacterId from, CharacterId to, OwnerCause how, ChangeCause cause) {
+        Claim claim = store.require(claimId);
+        if (!claim.isOwnedBy(from)) {
+            throw RefusedException.of("ownership.not-owner", "claim", claim.id());
+        }
+        OwnershipCheck check = canTransfer(claim, from, to);
+        if (check != OwnershipCheck.OK) {
+            throw refusal(check, claim, to);
+        }
+        List<ClaimOwner> owners = claim.owners().stream()
+                .map(owner -> owner.character().equals(from) ? new ClaimOwner(to, clock.instant(), how) : owner)
+                .toList();
+        Claim changed = claim.withOwners(owners)
+                .withGroups(claim.groups().stream().map(group -> group.withoutMember(to)).toList());
+        store.save(changed, cause);
+        return changed;
+    }
+
+    /** Removes every owner; the Claim's groups are cleared with the last one. */
+    public Claim clearOwners(String claimId, ChangeCause cause) {
+        Claim changed = store.require(claimId).withOwners(List.of()).withGroups(List.of());
+        store.save(changed, cause);
+        return changed;
+    }
+
+    private static List<ClaimOwner> withoutOwner(Claim claim, CharacterId character) {
+        return claim.owners().stream().filter(owner -> !owner.character().equals(character)).toList();
+    }
+
     /** @return the Claims the character owns */
     public List<Claim> ownedBy(CharacterId character) {
         return store.state().ownedBy(character);
@@ -104,13 +152,24 @@ public final class OwnershipService {
     private Claim add(Claim claim, CharacterId character, OwnerCause how, ChangeCause cause, boolean force) {
         OwnershipCheck check = canOwn(character, claim);
         if (check != OwnershipCheck.OK && !(force && check == OwnershipCheck.TYPE_LIMIT)) {
-            throw RefusedException.of(check.messageKey(), "claim", claim.id(), "character", character.profile(),
-                    "type", claim.typeId());
+            throw refusal(check, claim, character);
         }
         List<ClaimOwner> owners = new ArrayList<>(claim.owners());
         owners.add(new ClaimOwner(character, clock.instant(), how));
         Claim changed = claim.withOwners(owners);
         store.save(changed, cause);
         return changed;
+    }
+
+    /** @return the refusal that tells a player why the character can't own the Claim */
+    static RefusedException refusal(OwnershipCheck check, Claim claim, CharacterId character) {
+        String[] values = {"claim", claim.id(), "character", character.profile(), "type", claim.typeId()};
+        return switch (check) {
+            case TYPE_LIMIT -> RefusedException.of("ownership.type-limit", values);
+            case FULL -> RefusedException.of("ownership.full", values);
+            case ALREADY_OWNER -> RefusedException.of("ownership.already-owner", values);
+            case UNKNOWN_CHARACTER -> RefusedException.of("ownership.unknown-character", values);
+            case OK -> throw new IllegalArgumentException("OK is not a refusal");
+        };
     }
 }

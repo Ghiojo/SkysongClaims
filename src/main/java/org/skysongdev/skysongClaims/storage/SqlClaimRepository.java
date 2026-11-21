@@ -1,15 +1,14 @@
 package org.skysongdev.skysongClaims.storage;
 
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.GroupPermission;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimGroup;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimRepository;
-import org.skysongdev.skysongClaims.claim.GroupPermission;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongstats.api.CharacterId;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 /** Saves Claims in the MySQL tables of {@link DatabaseSchema}. Blocking: wrap it in {@link AsyncClaimRepository}. */
 public final class SqlClaimRepository implements ClaimRepository {

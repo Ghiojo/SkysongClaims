@@ -1,6 +1,7 @@
 package org.skysongdev.skysongClaims.type;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.LimitScope;
 
 import java.util.List;
 import java.util.Map;

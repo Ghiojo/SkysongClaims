@@ -1,4 +1,4 @@
-package org.skysongdev.skysongClaims.limit;
+package org.skysongdev.skysongClaims.api;
 
 import org.skysongdev.skysongstats.api.CharacterId;
 

@@ -6,10 +6,11 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.MenuButton;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.commands.ClaimArguments;
 import org.skysongdev.skysongClaims.messaging.Messenger;
@@ -82,11 +83,11 @@ public final class SignMenus {
             if (slot >= ClaimMenu.SIZE) {
                 break;
             }
-            Optional<ItemStack> icon = button.icon(player, claim);
+            Optional<ItemStack> icon = button.icon(player, claim.info());
             if (icon.isPresent()) {
                 menu.set(slot++, icon.get(), viewer -> {
                     viewer.closeInventory();
-                    claims.find(claim.id()).ifPresent(current -> button.click(viewer, current));
+                    claims.find(claim.id()).ifPresent(current -> button.click(viewer, current.info()));
                 });
             }
         }
@@ -144,7 +145,7 @@ public final class SignMenus {
         try {
             CharacterId character = characters.active(player.getUniqueId())
                     .orElseThrow(() -> RefusedException.of("command.you-have-no-character"));
-            Claim claim = ownership.removeOwner(claimId, character, ChangeCause.COMMAND);
+            Claim claim = ownership.removeOwner(claimId, character, ChangeCause.LEAVE);
             messenger.send(player, "player.left", unparsed("claim", claim.id()), parsed("name", claim.displayName()));
         } catch (RefusedException refusal) {
             messenger.send(player, refusal);

@@ -1,6 +1,11 @@
 package org.skysongdev.skysongClaims.claim;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.GroupPermission;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.time.Instant;

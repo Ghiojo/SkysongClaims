@@ -1,4 +1,4 @@
-package org.skysongdev.skysongClaims.type;
+package org.skysongdev.skysongClaims.api;
 
 import java.util.Locale;
 import java.util.Optional;

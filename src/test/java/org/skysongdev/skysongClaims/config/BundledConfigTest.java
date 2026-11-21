@@ -2,10 +2,10 @@ package org.skysongdev.skysongClaims.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.type.ClaimType;
 import org.skysongdev.skysongClaims.type.ClaimTypesParser;
-import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.io.IOException;
 import java.io.InputStream;

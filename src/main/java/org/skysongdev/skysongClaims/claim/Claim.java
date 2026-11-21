@@ -1,5 +1,9 @@
 package org.skysongdev.skysongClaims.claim;
 
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimInfo;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.util.Collections;
@@ -86,6 +90,11 @@ public record Claim(
     /** @return how many more owners it has room for, never negative */
     public int openSlots() {
         return Math.max(0, maxOwners - owners.size());
+    }
+
+    /** @return what the API shows of it: everything but its groups and flags */
+    public ClaimInfo info() {
+        return new ClaimInfo(id, displayName, typeId, free, maxOwners, regions, owners, saleSetBy);
     }
 
     public Optional<ClaimGroup> group(String groupId) {

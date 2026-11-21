@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.type;
 
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.config.ConfigException;
 import org.skysongdev.skysongClaims.config.ConfigSection;
 

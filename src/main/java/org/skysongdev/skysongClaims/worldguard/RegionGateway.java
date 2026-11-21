@@ -1,7 +1,7 @@
 package org.skysongdev.skysongClaims.worldguard;
 
 import org.bukkit.Location;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 
 import java.util.List;
 import java.util.Optional;

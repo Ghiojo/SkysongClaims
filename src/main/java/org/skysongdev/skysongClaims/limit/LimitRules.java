@@ -1,5 +1,7 @@
 package org.skysongdev.skysongClaims.limit;
 
+import org.skysongdev.skysongClaims.api.LimitRule;
+import org.skysongdev.skysongClaims.api.LimitSubject;
 import org.skysongdev.skysongClaims.type.ClaimType;
 
 import java.util.LinkedHashMap;
@@ -39,7 +41,7 @@ public final class LimitRules {
         int total = 0;
         for (Map.Entry<Key, LimitRule> entry : rules.entrySet()) {
             try {
-                total += entry.getValue().bonus(subject, type);
+                total += entry.getValue().bonus(subject, type.info());
             } catch (RuntimeException e) {
                 failures.accept("The limit rule " + entry.getKey().id() + " of " + entry.getKey().plugin() + " failed", e);
             }

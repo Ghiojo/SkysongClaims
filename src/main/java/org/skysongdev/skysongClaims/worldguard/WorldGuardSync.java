@@ -1,9 +1,9 @@
 package org.skysongdev.skysongClaims.worldguard;
 
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.Claim;
 import org.skysongdev.skysongClaims.claim.ClaimChange;
 import org.skysongdev.skysongClaims.claim.ClaimObserver;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 
 import java.util.HashSet;

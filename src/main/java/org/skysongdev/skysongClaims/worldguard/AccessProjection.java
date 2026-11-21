@@ -1,10 +1,10 @@
 package org.skysongdev.skysongClaims.worldguard;
 
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.GroupPermission;
 import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimGroup;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.GroupPermission;
 import org.skysongdev.skysongClaims.type.ClaimType;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongClaims.type.ClaimTypesParser;

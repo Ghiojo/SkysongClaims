@@ -1,8 +1,8 @@
 package org.skysongdev.skysongClaims.config;
 
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.group.GroupLimits;
 import org.skysongdev.skysongClaims.storage.DatabaseSettings;
-import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.time.Duration;
 import java.util.List;

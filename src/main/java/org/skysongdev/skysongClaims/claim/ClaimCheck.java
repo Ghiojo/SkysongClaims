@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.claim;
 
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.worldguard.RegionGateway;

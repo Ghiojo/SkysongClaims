@@ -1,7 +1,7 @@
 package org.skysongdev.skysongClaims.config;
 
 import org.junit.jupiter.api.Test;
-import org.skysongdev.skysongClaims.type.LimitScope;
+import org.skysongdev.skysongClaims.api.LimitScope;
 
 import java.io.StringReader;
 

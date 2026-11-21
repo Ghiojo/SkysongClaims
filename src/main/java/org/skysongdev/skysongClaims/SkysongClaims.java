@@ -4,6 +4,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.skysongdev.skysongClaims.apiimpl.ApiRegistration;
+import org.skysongdev.skysongClaims.apiimpl.EventBridge;
+import org.skysongdev.skysongClaims.apiimpl.MainThread;
+import org.skysongdev.skysongClaims.apiimpl.PluginCleanup;
 import org.skysongdev.skysongClaims.apiimpl.SkysongClaimsApiImpl;
 import org.skysongdev.skysongClaims.character.CharacterDirectory;
 import org.skysongdev.skysongClaims.character.StatsCharacterDirectory;
@@ -94,6 +97,8 @@ public final class SkysongClaims extends JavaPlugin {
         ClaimService claims = new ClaimService(store, types, regions);
         warnAboutUnknownTypes(claims);
 
+        EventBridge events = new EventBridge(getServer().getPluginManager()::callEvent);
+        store.observe(events);
         WorldGuardSync sync = new WorldGuardSync(state, regions, new AccessProjection(characters, types), getLogger()::warning);
         store.observe(sync);
         config.onReload(loaded -> sync.syncAll());
@@ -109,7 +114,8 @@ public final class SkysongClaims extends JavaPlugin {
                 Clock.systemUTC());
         CharacterArguments characterArguments = new CharacterArguments(characters);
         GroupService groups = new GroupService(store, () -> config.current().settings().groupLimits());
-        registerCommand("sclaim", new PlayerCommand(new PlayerSupport(state, new ClaimLocator(state, regions), ownership,
+        ClaimLocator locator = new ClaimLocator(state, regions);
+        registerCommand("sclaim", new PlayerCommand(new PlayerSupport(state, locator, ownership,
                 invites, limits, types, characterArguments, messenger), groups,
                 new FlagService(store, () -> config.current().settings().ownerFlags(), types, regions)));
 
@@ -117,9 +123,11 @@ public final class SkysongClaims extends JavaPlugin {
                 new SignText(messenger, types), getLogger()::info);
         signs.load();
         store.observe(signs);
+        signs.listen(events);
         config.onReload(loaded -> signs.redrawAll());
         signs.redrawAll();
         MenuButtons menuButtons = new MenuButtons();
+        getServer().getPluginManager().registerEvents(new PluginCleanup(limitRules, menuButtons), this);
         getServer().getPluginManager().registerEvents(new SignListener(signs,
                 new SignMenus(state, ownership, characters, types, menuButtons, messenger), state, messenger), this);
 
@@ -134,8 +142,14 @@ public final class SkysongClaims extends JavaPlugin {
             return report;
         }));
 
+        // Last, so plugins listening hear about types other listeners already reloaded.
+        config.onReload(loaded -> events.reloaded());
+
         // The API is offered last, once everything behind it is running.
-        api = new ApiRegistration(getServer().getServicesManager(), new SkysongClaimsApiImpl());
+        SkysongClaimsApiImpl.Features features = new SkysongClaimsApiImpl.Features(state, types,
+                locator, claims, ownership, limits, limitRules, signs, menuButtons);
+        api = new ApiRegistration(getServer().getServicesManager(),
+                new SkysongClaimsApiImpl(features, new MainThread(getServer()::isPrimaryThread)));
         api.register(this);
     }
 

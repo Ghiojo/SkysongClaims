@@ -1,8 +1,8 @@
 package org.skysongdev.skysongClaims.storage;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
 
 import java.util.List;

@@ -2,14 +2,14 @@ package org.skysongdev.skysongClaims.flag;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.group.Manager;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 import org.skysongdev.skysongClaims.support.FakeCharacters;

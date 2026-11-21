@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.claim;
 
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 import org.skysongdev.skysongClaims.type.ClaimType;
@@ -9,6 +10,7 @@ import org.skysongdev.skysongClaims.worldguard.RegionGateway;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
@@ -132,6 +134,17 @@ public final class ClaimService {
     }
 
     /** @return the Claims whose type is no longer in {@code types.yml}, by id */
+    /**
+     * Puts the Claim on sale or takes it off.
+     *
+     * @param setBy the plugin that put it on sale, empty to take it off
+     */
+    public Claim setForSale(String id, Optional<String> setBy, ChangeCause cause) {
+        Claim changed = require(id).withSale(setBy);
+        store.save(changed, cause);
+        return changed;
+    }
+
     public List<Claim> withUnknownType() {
         ClaimTypeRegistry registry = types.get();
         return store.state().all().stream().filter(claim -> registry.find(claim.typeId()).isEmpty()).toList();
