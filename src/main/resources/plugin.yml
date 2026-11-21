@@ -1,4 +1,9 @@
 name: SkysongClaims
-version: '1.0'
+version: '${version}'
 main: org.skysongdev.skysongClaims.SkysongClaims
-api-version: '1.21'
+api-version: '1.21.11'
+description: Claims made of WorldGuard regions, owned by SkysongStats characters.
+
+# WorldGuard enforces who may build in a Claim's regions, and every owner is a SkysongStats
+# character, so the plugin can't run without either.
+depend: [WorldGuard, SkysongStats]
