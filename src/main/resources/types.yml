@@ -1,0 +1,24 @@
+# Claim types. Every Claim has one. Run /sclaims reload after editing.
+#
+#   display-name  the name players see, in MiniMessage
+#   limit         how many Claims of this type one character (or account) may own;
+#                 other plugins can raise it for some players through the API
+#   limit-per     character or account; config.yml's limit-per when left out
+#   free-claim    makes new Claims of this type Free Claims that players take themselves,
+#                 with default-max-owners slots
+#   max-owners    for other types: how many owners a new Claim has room for (1 when left out)
+#   open-use      WorldGuard flags set to allow for everyone in the Claim's regions; when left
+#                 out: use, chest-access, interact, sleep, use-anvil, use-dripleaf,
+#                 respawn-anchors, ride, vehicle-place, vehicle-destroy, item-frame-rotation
+#   extra         free settings that other plugins read, e.g. SkysongEconomy price modifiers
+types:
+  hovel:
+    display-name: "<gold>Hovel"
+    limit: 1
+    free-claim: { default-max-owners: 2 }
+    open-use: [use, chest-access, interact, sleep, use-anvil, use-dripleaf, respawn-anchors, ride,
+               vehicle-place, vehicle-destroy, item-frame-rotation]
+    extra: {}
+  other:
+    display-name: "Other"
+    limit: 3

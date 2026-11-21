@@ -1,0 +1,6 @@
+# SkysongClaims settings. Run /sclaims reload after editing.
+
+# Whether a type's limit counts per character (each SkysongStats profile has its own count)
+# or per account (all of a player's characters share one count). A type in types.yml can
+# override it with its own limit-per.
+limit-per: character
