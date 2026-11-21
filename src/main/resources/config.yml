@@ -1,4 +1,12 @@
-# SkysongClaims settings. Run /sclaims reload after editing.
+# SkysongClaims settings. Run /sclaims reload after editing (database changes need a restart).
+
+# The MySQL database Claims are saved in. It can be the same database as other Skysong plugins.
+database:
+  host: localhost
+  port: 3306
+  user: root
+  password: ""
+  database_name: skysong
 
 # Whether a type's limit counts per character (each SkysongStats profile has its own count)
 # or per account (all of a player's characters share one count). A type in types.yml can

@@ -1,6 +1,7 @@
 package org.skysongdev.skysongClaims.config;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.storage.DatabaseSettings;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongClaims.type.LimitScope;
 
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConfigHolderTest {
     private static LoadedConfig config(LimitScope scope) {
-        return new LoadedConfig(new PluginSettings(scope), ClaimTypeRegistry.empty());
+        return new LoadedConfig(new PluginSettings(new DatabaseSettings("localhost", 3306, "root", "", "skysong"), scope), ClaimTypeRegistry.empty());
     }
 
     /** Hands out the given configs in order, throwing for a {@code null} entry. */

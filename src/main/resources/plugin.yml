@@ -7,3 +7,7 @@ description: Claims made of WorldGuard regions, owned by SkysongStats characters
 # WorldGuard enforces who may build in a Claim's regions, and every owner is a SkysongStats
 # character, so the plugin can't run without either.
 depend: [WorldGuard, SkysongStats]
+
+# Downloaded by Paper at start-up: the MySQL connection pool.
+libraries:
+  - com.zaxxer:HikariCP:6.2.1

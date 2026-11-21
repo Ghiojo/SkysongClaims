@@ -45,6 +45,9 @@ dependencies {
     compileOnly 'org.jetbrains:annotations:26.0.2'
     // Hard dependencies (plugin.yml depend:): both ship on the server, so neither is shaded.
     compileOnly(skysongStatsApi)
+    // Connection pool for MySQL. Paper downloads it at start-up from plugin.yml's
+    // "libraries:" list, so it isn't bundled into the jar.
+    compileOnly 'com.zaxxer:HikariCP:6.2.1'
     compileOnly(worldGuard) {
         exclude group: 'org.bukkit'
         exclude group: 'org.spigotmc'
@@ -58,6 +61,9 @@ dependencies {
     testImplementation 'org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.116.3'
     testImplementation(paperApi)
     testImplementation(skysongStatsApi)
+    // The SQL repositories are tested on H2 in MySQL mode: their SQL is plain MySQL.
+    testImplementation 'com.h2database:h2:2.3.232'
+    testImplementation 'com.zaxxer:HikariCP:6.2.1'
 }
 
 test {
