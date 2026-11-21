@@ -48,4 +48,10 @@ class PluginSettingsTest {
                 parse("{max-groups-per-claim: 2, max-members-per-group: 10}").groupLimits());
         assertThrows(ConfigException.class, () -> parse("max-groups-per-claim: -1"));
     }
+
+    @Test
+    void ownersSetGreetingAndFarewellByDefault() {
+        assertEquals(java.util.List.of("greeting", "farewell"), parse("").ownerFlags());
+        assertEquals(java.util.List.of("greeting-title"), parse("owner-flags: [Greeting-Title]").ownerFlags());
+    }
 }

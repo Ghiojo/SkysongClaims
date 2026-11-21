@@ -18,6 +18,7 @@ public final class FakeRegions implements RegionGateway {
     private final Map<ClaimRegion, RegionAccess> applied = new HashMap<>();
     private final Set<String> unknownFlags = new HashSet<>();
     private List<ClaimRegion> standingIn = List.of();
+    private final Set<String> cleared = new HashSet<>();
 
     public FakeRegions add(String world, String... ids) {
         for (String id : ids) {
@@ -59,6 +60,22 @@ public final class FakeRegions implements RegionGateway {
         }
         applied.put(region, access);
         return access.openUse().stream().filter(unknownFlags::contains).toList();
+    }
+
+    @Override
+    public void clearFlag(ClaimRegion region, String flag) {
+        cleared.add(region + "/" + flag);
+    }
+
+    /** @return {@code world:region/flag} for every flag cleared */
+    public Set<String> cleared() {
+        return cleared;
+    }
+
+    /** Fake WorldGuard refuses the value {@code bad} for any flag. */
+    @Override
+    public java.util.Optional<String> checkFlag(String flag, String value) {
+        return value.equals("bad") ? java.util.Optional.of("bad value") : java.util.Optional.empty();
     }
 
     @Override

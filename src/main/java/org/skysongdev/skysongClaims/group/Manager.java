@@ -7,7 +7,7 @@ import org.skysongdev.skysongstats.api.CharacterId;
 import java.util.Objects;
 import java.util.Optional;
 
-/** Who is managing a Claim's groups: one of its owners, or staff, who may manage any Claim. */
+/** Who is managing a Claim's groups or flags: one of its owners, or staff, who may manage any Claim. */
 public final class Manager {
     private static final Manager STAFF = new Manager(Optional.empty());
 
@@ -26,7 +26,7 @@ public final class Manager {
     }
 
     /** @throws RefusedException {@code ownership.not-owner} when an owner manager doesn't own the Claim */
-    void check(Claim claim) {
+    public void check(Claim claim) {
         if (owner.isPresent() && !claim.isOwnedBy(owner.get())) {
             throw RefusedException.of("ownership.not-owner", "claim", claim.id());
         }

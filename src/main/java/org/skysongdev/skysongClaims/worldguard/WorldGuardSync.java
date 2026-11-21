@@ -49,9 +49,9 @@ public final class WorldGuardSync implements ClaimObserver {
         RegionAccess access = projection.of(claim);
         for (ClaimRegion region : claim.regions()) {
             for (String flag : regions.apply(region, access)) {
-                if (warnedFlags.add(flag)) {
-                    warnings.accept("The open-use flag '" + flag + "' of type " + claim.typeId()
-                            + " is not an allow/deny flag WorldGuard knows, so it was skipped");
+                if (warnedFlags.add(claim.id() + ":" + flag)) {
+                    warnings.accept("The flag '" + flag + "' of claim " + claim.id() + " (type " + claim.typeId()
+                            + ") was skipped: WorldGuard doesn't know it, or doesn't accept its value");
                 }
             }
         }
@@ -61,9 +61,18 @@ public final class WorldGuardSync implements ClaimObserver {
     public void claimChanged(ClaimChange change) {
         Set<ClaimRegion> left = new LinkedHashSet<>(change.before().map(Claim::regions).orElse(List.of()));
         change.after().ifPresent(after -> left.removeAll(after.regions()));
-        // A region that leaves a Claim goes back to staff with no owners or members; its flags stay.
-        left.forEach(region -> regions.apply(region, RegionAccess.released()));
-        change.after().ifPresent(this::sync);
+        // A region that leaves a Claim goes back to staff with no owners, members or owner flags;
+        // the open-use flags stay.
+        Set<String> beforeFlags = change.before().map(claim -> claim.flags().keySet()).orElse(Set.of());
+        for (ClaimRegion region : left) {
+            regions.apply(region, RegionAccess.released());
+            beforeFlags.forEach(flag -> regions.clearFlag(region, flag));
+        }
+        change.after().ifPresent(after -> {
+            beforeFlags.stream().filter(flag -> !after.flags().containsKey(flag))
+                    .forEach(flag -> after.regions().forEach(region -> regions.clearFlag(region, flag)));
+            sync(after);
+        });
     }
 
     private static boolean involvesPlayer(Claim claim, UUID player) {

@@ -4,6 +4,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.FlagContext;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -15,6 +17,7 @@ import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -66,7 +69,52 @@ public final class WorldGuardRegions implements RegionGateway {
                 region.setFlag(stateFlag, StateFlag.State.ALLOW);
             }
         }
+        access.flags().forEach((name, input) -> {
+            Flag<?> flag = WorldGuard.getInstance().getFlagRegistry().get(name);
+            try {
+                if (flag == null) {
+                    throw new InvalidFlagFormat("unknown flag");
+                }
+                setParsed(region, flag, input);
+            } catch (InvalidFlagFormat e) {
+                skipped.add(name);
+            }
+        });
         return skipped;
+    }
+
+    @Override
+    public void clearFlag(ClaimRegion claimRegion, String name) {
+        Flag<?> flag = WorldGuard.getInstance().getFlagRegistry().get(name);
+        if (flag == null) {
+            return;
+        }
+        region(claimRegion).filter(region -> region.getFlag(flag) != null).ifPresent(region -> region.setFlag(flag, null));
+    }
+
+    @Override
+    public Optional<String> checkFlag(String name, String input) {
+        Flag<?> flag = WorldGuard.getInstance().getFlagRegistry().get(name);
+        if (flag == null) {
+            return Optional.of("WorldGuard has no flag " + name);
+        }
+        try {
+            flag.parseInput(context(input));
+            return Optional.empty();
+        } catch (InvalidFlagFormat e) {
+            return Optional.of(e.getMessage());
+        }
+    }
+
+    private static <V> void setParsed(ProtectedRegion region, Flag<V> flag, String input) throws InvalidFlagFormat {
+        V value = flag.parseInput(context(input));
+        if (!Objects.equals(region.getFlag(flag), value)) {
+            region.setFlag(flag, value);
+        }
+    }
+
+    private static FlagContext context(String input) {
+        return FlagContext.create().setInput(input).build();
     }
 
     /** Only touches the domain when it differs, so WorldGuard doesn't save unchanged regions. */

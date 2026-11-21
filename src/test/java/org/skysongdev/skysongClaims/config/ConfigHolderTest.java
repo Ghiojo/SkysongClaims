@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConfigHolderTest {
     private static LoadedConfig config(LimitScope scope) {
         return new LoadedConfig(new PluginSettings(new DatabaseSettings("localhost", 3306, "root", "", "skysong"), scope, java.time.Duration.ofMinutes(5),
-                new org.skysongdev.skysongClaims.group.GroupLimits(5, 0)), ClaimTypeRegistry.empty(), TestMessages.catalog());
+                new org.skysongdev.skysongClaims.group.GroupLimits(5, 0), java.util.List.of()), ClaimTypeRegistry.empty(), TestMessages.catalog());
     }
 
     /** Hands out the given configs in order, throwing for a {@code null} entry. */

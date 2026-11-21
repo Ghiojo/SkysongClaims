@@ -46,6 +46,10 @@ final class ClaimInfo extends LeafCommand {
                     claim.groups().stream().map(group -> group.id() + " (" + group.members().size() + ")")
                             .collect(Collectors.joining(", "))));
         }
+        if (!claim.flags().isEmpty()) {
+            messenger.send(sender, "claims.info.flags", unparsed("flags", claim.flags().entrySet().stream()
+                    .map(flag -> flag.getKey() + ": " + flag.getValue()).collect(Collectors.joining(", "))));
+        }
         claim.saleSetBy().ifPresent(plugin -> messenger.send(sender, "claims.info.for-sale", unparsed("plugin", plugin)));
     }
 

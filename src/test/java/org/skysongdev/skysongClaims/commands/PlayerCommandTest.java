@@ -17,6 +17,7 @@ import org.skysongdev.skysongClaims.claim.ClaimStore;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
 import org.skysongdev.skysongClaims.commands.player.PlayerCommand;
 import org.skysongdev.skysongClaims.commands.player.PlayerSupport;
+import org.skysongdev.skysongClaims.flag.FlagService;
 import org.skysongdev.skysongClaims.group.GroupLimits;
 import org.skysongdev.skysongClaims.group.GroupService;
 import org.skysongdev.skysongClaims.limit.LimitRules;
@@ -72,7 +73,8 @@ class PlayerCommandTest {
         InviteService invites = new InviteService(store, ownership, () -> Duration.ofMinutes(5), clock);
         command = new PlayerCommand(new PlayerSupport(state, new ClaimLocator(state, regions), ownership, invites, limits,
                 TestTypes::registry, new CharacterArguments(characters), TestMessages.messenger()),
-                new GroupService(store, () -> new GroupLimits(5, 0)));
+                new GroupService(store, () -> new GroupLimits(5, 0)),
+                new FlagService(store, () -> List.of("greeting", "farewell", "use"), TestTypes::registry, regions));
     }
 
     @AfterEach
@@ -200,5 +202,17 @@ class PlayerCommandTest {
     void onlyOwnersManageGroups() {
         assertTrue(run(bobPlayer, "group hovel_1 create Family").get(0).contains("You don't own hovel_1"));
         assertTrue(run(bobPlayer, "group hovel_1 fly").get(0).contains("Usage"));
+    }
+
+    @Test
+    void ownersSetGreetingButNeverOpenUseFlags() {
+        run(alicePlayer, "take");
+
+        assertTrue(run(alicePlayer, "flag hovel_1 greeting Welcome home").get(0).contains("Set greeting on hovel_1 to Welcome home"));
+        assertEquals("Welcome home", store.require("hovel_1").flags().get("greeting"));
+        assertTrue(run(alicePlayer, "flag hovel_1 use deny").get(0).contains("can't set use"));
+        assertTrue(run(alicePlayer, "flag hovel_1 greeting clear").get(0).contains("Cleared greeting"));
+        assertTrue(store.require("hovel_1").flags().isEmpty());
+        assertTrue(run(bobPlayer, "flag hovel_1 greeting Hi").get(0).contains("You don't own hovel_1"));
     }
 }

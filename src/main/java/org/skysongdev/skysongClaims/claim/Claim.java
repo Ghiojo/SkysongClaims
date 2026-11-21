@@ -2,10 +2,13 @@ package org.skysongdev.skysongClaims.claim;
 
 import org.skysongdev.skysongstats.api.CharacterId;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
@@ -22,6 +25,7 @@ import java.util.regex.Pattern;
  * @param owners      its owners, in the order they joined
  * @param groups      its owners' groups, in the order they were made
  * @param saleSetBy   the plugin that put it on sale, empty when it isn't for sale
+ * @param flags       the WorldGuard flags its owners set, by flag name, as they typed the value
  */
 public record Claim(
         String id,
@@ -32,7 +36,8 @@ public record Claim(
         List<ClaimRegion> regions,
         List<ClaimOwner> owners,
         List<ClaimGroup> groups,
-        Optional<String> saleSetBy) {
+        Optional<String> saleSetBy,
+        Map<String, String> flags) {
 
     private static final Pattern ID = Pattern.compile("[a-z0-9_-]{1,32}");
 
@@ -53,11 +58,12 @@ public record Claim(
         }
         owners = List.copyOf(owners);
         groups = List.copyOf(groups);
+        flags = Collections.unmodifiableMap(new TreeMap<>(flags));
     }
 
     /** @return a new, unowned Claim with no groups that isn't for sale */
     public static Claim create(String id, String typeId, boolean free, int maxOwners, List<ClaimRegion> regions) {
-        return new Claim(id, id, typeId, free, maxOwners, regions, List.of(), List.of(), Optional.empty());
+        return new Claim(id, id, typeId, free, maxOwners, regions, List.of(), List.of(), Optional.empty(), Map.of());
     }
 
     /** @return whether {@code id} can name a Claim: 1 to 32 lower case letters, digits, '_' or '-' */
@@ -105,30 +111,34 @@ public record Claim(
     }
 
     public Claim withDisplayName(String newDisplayName) {
-        return new Claim(id, newDisplayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy);
+        return new Claim(id, newDisplayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withType(String newTypeId) {
-        return new Claim(id, displayName, newTypeId, free, maxOwners, regions, owners, groups, saleSetBy);
+        return new Claim(id, displayName, newTypeId, free, maxOwners, regions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withFree(boolean newFree, int newMaxOwners) {
-        return new Claim(id, displayName, typeId, newFree, newMaxOwners, regions, owners, groups, saleSetBy);
+        return new Claim(id, displayName, typeId, newFree, newMaxOwners, regions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withRegions(List<ClaimRegion> newRegions) {
-        return new Claim(id, displayName, typeId, free, maxOwners, newRegions, owners, groups, saleSetBy);
+        return new Claim(id, displayName, typeId, free, maxOwners, newRegions, owners, groups, saleSetBy, flags);
     }
 
     public Claim withOwners(List<ClaimOwner> newOwners) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, newOwners, groups, saleSetBy);
+        return new Claim(id, displayName, typeId, free, maxOwners, regions, newOwners, groups, saleSetBy, flags);
     }
 
     public Claim withGroups(List<ClaimGroup> newGroups) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, newGroups, saleSetBy);
+        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, newGroups, saleSetBy, flags);
+    }
+
+    public Claim withFlags(Map<String, String> newFlags) {
+        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy, newFlags);
     }
 
     public Claim withSale(Optional<String> newSaleSetBy) {
-        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, groups, newSaleSetBy);
+        return new Claim(id, displayName, typeId, free, maxOwners, regions, owners, groups, newSaleSetBy, flags);
     }
 }
