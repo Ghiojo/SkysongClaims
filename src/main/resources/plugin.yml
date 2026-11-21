@@ -1,0 +1,4 @@
+name: SkysongClaims
+version: '1.0'
+main: org.skysongdev.skysongClaims.SkysongClaims
+api-version: '1.21'
