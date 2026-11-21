@@ -11,3 +11,14 @@ depend: [WorldGuard, SkysongStats]
 # Downloaded by Paper at start-up: the MySQL connection pool.
 libraries:
   - com.zaxxer:HikariCP:6.2.1
+
+commands:
+  sclaims:
+    description: "Staff commands for Claims"
+    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|info|list|reload>"
+    permission: skysongclaims.admin
+
+permissions:
+  skysongclaims.admin:
+    description: "Use /sclaims and do everything in any Claim, including removing owners."
+    default: op
