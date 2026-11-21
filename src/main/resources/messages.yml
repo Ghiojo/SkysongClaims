@@ -40,6 +40,10 @@ claims:
   reloaded: "<green>Reloaded SkysongClaims: <types> Claim type(s)."
   reload-failed: "<red>Nothing was reloaded, because a file has a mistake: <white><error>"
   unknown-type-warning: "<yellow>The Claim <claim> has the type <type>, which is no longer in types.yml."
+  check:
+    missing-region: "<yellow>The Claim <claim> has the region <region>, which WorldGuard no longer has. Fix it with /sclaims removeregion or recreate the region."
+    released: "<yellow>Released <character> from <claim>: that character no longer exists."
+    done: "<green>Check done: <missing> missing region(s), <released> character(s) released. WorldGuard is up to date."
   info:
     header: "<gold><name></gold> <gray>(<claim>)"
     type: "<gray>Type: <white><type_name></white> (<type>)"

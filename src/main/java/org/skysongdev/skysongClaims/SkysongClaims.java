@@ -5,7 +5,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.skysongdev.skysongClaims.apiimpl.ApiRegistration;
 import org.skysongdev.skysongClaims.apiimpl.SkysongClaimsApiImpl;
+import org.skysongdev.skysongClaims.character.CharacterDirectory;
+import org.skysongdev.skysongClaims.character.StatsCharacterDirectory;
 import org.skysongdev.skysongClaims.claim.Claim;
+import org.skysongdev.skysongClaims.claim.ClaimCheck;
 import org.skysongdev.skysongClaims.claim.ClaimService;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
@@ -22,8 +25,12 @@ import org.skysongdev.skysongClaims.config.YamlFiles;
 import org.skysongdev.skysongClaims.messaging.Messenger;
 import org.skysongdev.skysongClaims.storage.ClaimStorage;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
+import org.skysongdev.skysongClaims.worldguard.AccessProjection;
 import org.skysongdev.skysongClaims.worldguard.RegionGateway;
+import org.skysongdev.skysongClaims.worldguard.SyncListener;
 import org.skysongdev.skysongClaims.worldguard.WorldGuardRegions;
+import org.skysongdev.skysongClaims.worldguard.WorldGuardSync;
+import org.skysongdev.skysongstats.api.SkysongStatsApi;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,19 +72,39 @@ public final class SkysongClaims extends JavaPlugin {
         Supplier<ClaimTypeRegistry> types = () -> config.current().types();
         Messenger messenger = new Messenger(MiniMessage.miniMessage(), () -> config.current().messages());
         RegionGateway regions = new WorldGuardRegions();
+        CharacterDirectory characters = new StatsCharacterDirectory(SkysongStatsApi.get());
         ClaimStore store = new ClaimStore(state, storage.claims());
         ClaimService claims = new ClaimService(store, types, regions);
         warnAboutUnknownTypes(claims);
+
+        WorldGuardSync sync = new WorldGuardSync(state, regions, new AccessProjection(characters, types), getLogger()::warning);
+        store.observe(sync);
+        config.onReload(loaded -> sync.syncAll());
+        ClaimCheck check = new ClaimCheck(store, regions, characters);
+        logCheck(check.run());
+        sync.syncAll();
+        getServer().getPluginManager().registerEvents(new SyncListener(sync), this);
 
         StaffSupport staff = new StaffSupport(claims, state, types, new ClaimArguments(state, types, regions), messenger);
         registerCommand("sclaims", new StaffCommand(staff, () -> {
             config.reload();
             warnAboutUnknownTypes(claims);
+        }, () -> {
+            ClaimCheck.Report report = check.run();
+            sync.syncAll();
+            return report;
         }));
 
         // The API is offered last, once everything behind it is running.
         api = new ApiRegistration(getServer().getServicesManager(), new SkysongClaimsApiImpl());
         api.register(this);
+    }
+
+    private void logCheck(ClaimCheck.Report report) {
+        report.missingRegions().forEach(missing -> getLogger().warning("Claim " + missing.claimId()
+                + " has the region " + missing.region() + ", which WorldGuard no longer has"));
+        report.released().forEach(released -> getLogger().info("Released " + released.character()
+                + " from claim " + released.claimId() + ": that character no longer exists"));
     }
 
     private void warnAboutUnknownTypes(ClaimService claims) {

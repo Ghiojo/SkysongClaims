@@ -15,7 +15,7 @@ libraries:
 commands:
   sclaims:
     description: "Staff commands for Claims"
-    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|info|list|reload>"
+    usage: "/sclaims <create|delete|addregion|removeregion|settype|free|maxowners|rename|info|list|check|reload>"
     permission: skysongclaims.admin
 
 permissions:

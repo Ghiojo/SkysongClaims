@@ -86,6 +86,24 @@ public record Claim(
         return groups.stream().filter(group -> group.id().equals(groupId)).findFirst();
     }
 
+    /**
+     * @return the Claim without the character as an owner or group member. When it was the last
+     *         owner the Claim is unowned again, so its groups are cleared.
+     */
+    public Claim withoutCharacter(CharacterId character) {
+        List<ClaimOwner> remaining = owners.stream().filter(owner -> !owner.character().equals(character)).toList();
+        if (remaining.isEmpty()) {
+            return withOwners(remaining).withGroups(List.of());
+        }
+        List<ClaimGroup> cleaned = groups.stream().map(group -> group.withoutMember(character)).toList();
+        return withOwners(remaining).withGroups(cleaned);
+    }
+
+    /** @return whether the character owns the Claim or is in one of its groups */
+    public boolean involves(CharacterId character) {
+        return isOwnedBy(character) || groups.stream().anyMatch(group -> group.members().contains(character));
+    }
+
     public Claim withDisplayName(String newDisplayName) {
         return new Claim(id, newDisplayName, typeId, free, maxOwners, regions, owners, groups, saleSetBy);
     }
