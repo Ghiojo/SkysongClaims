@@ -1,4 +1,4 @@
-package org.skysongdev.skysongClaims.claim;
+package org.skysongdev.skysongClaims.api;
 
 /** How a character became an owner of a Claim. */
 public enum OwnerCause {

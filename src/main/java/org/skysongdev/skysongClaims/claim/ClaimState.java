@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.claim;
 
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.util.Collection;

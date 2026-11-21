@@ -1,12 +1,12 @@
 package org.skysongdev.skysongClaims.commands.player;
 
 import org.bukkit.command.CommandSender;
+import org.skysongdev.skysongClaims.api.LimitScope;
+import org.skysongdev.skysongClaims.api.LimitSubject;
 import org.skysongdev.skysongClaims.claim.Claim;
 import org.skysongdev.skysongClaims.commands.LeafCommand;
-import org.skysongdev.skysongClaims.limit.LimitSubject;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.type.ClaimType;
-import org.skysongdev.skysongClaims.type.LimitScope;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.util.List;

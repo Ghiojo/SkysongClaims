@@ -3,12 +3,12 @@ package org.skysongdev.skysongClaims.storage;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.GroupPermission;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimGroup;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
-import org.skysongdev.skysongClaims.claim.GroupPermission;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.time.Instant;

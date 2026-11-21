@@ -1,9 +1,9 @@
 package org.skysongdev.skysongClaims.support;
 
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.type.ClaimType;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
 import org.skysongdev.skysongClaims.type.ClaimTypesParser;
-import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.util.List;
 import java.util.Map;

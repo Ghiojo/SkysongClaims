@@ -1,8 +1,8 @@
 package org.skysongdev.skysongClaims.commands.staff;
 
 import org.bukkit.command.CommandSender;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.commands.LeafCommand;
 
 import java.util.List;

@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.mockbukkit.mockbukkit.MockBukkit;
 import org.mockbukkit.mockbukkit.ServerMock;
 import org.mockbukkit.mockbukkit.entity.PlayerMock;
+import org.skysongdev.skysongClaims.api.ClaimInfo;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.MenuButton;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
@@ -91,7 +93,7 @@ class SignMenusTest {
         owned.click(15, player);
         assertTrue(store.require("hovel_1").isOwnedBy(alice), "the first click only asks");
 
-        ClaimMenu confirm = (ClaimMenu) player.getOpenInventory().getTopInventory().getHolder(false);
+        ClaimMenu confirm = (ClaimMenu) player.getOpenInventory().getTopInventory().getHolder();
         confirm.click(15, player);
         assertFalse(store.require("hovel_1").isOwned());
     }
@@ -101,23 +103,23 @@ class SignMenusTest {
         List<String> clicked = new ArrayList<>();
         buttons.add("SkysongEconomy", "buy", new MenuButton() {
             @Override
-            public Optional<ItemStack> icon(Player viewer, Claim claim) {
+            public Optional<ItemStack> icon(Player viewer, ClaimInfo claim) {
                 return Optional.of(new ItemStack(Material.EMERALD));
             }
 
             @Override
-            public void click(Player viewer, Claim claim) {
+            public void click(Player viewer, ClaimInfo claim) {
                 clicked.add(claim.id());
             }
         });
         buttons.add("Other", "hidden", new MenuButton() {
             @Override
-            public Optional<ItemStack> icon(Player viewer, Claim claim) {
+            public Optional<ItemStack> icon(Player viewer, ClaimInfo claim) {
                 return Optional.empty();
             }
 
             @Override
-            public void click(Player viewer, Claim claim) {
+            public void click(Player viewer, ClaimInfo claim) {
             }
         });
 

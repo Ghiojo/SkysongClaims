@@ -1,10 +1,10 @@
 package org.skysongdev.skysongClaims.config;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.storage.DatabaseSettings;
 import org.skysongdev.skysongClaims.support.TestMessages;
 import org.skysongdev.skysongClaims.type.ClaimTypeRegistry;
-import org.skysongdev.skysongClaims.type.LimitScope;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,10 +1,10 @@
 package org.skysongdev.skysongClaims.group;
 
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.GroupPermission;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimGroup;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
-import org.skysongdev.skysongClaims.claim.GroupPermission;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 import org.skysongdev.skysongstats.api.CharacterId;
 

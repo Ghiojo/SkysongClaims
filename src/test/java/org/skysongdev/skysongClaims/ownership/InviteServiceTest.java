@@ -2,13 +2,13 @@ package org.skysongdev.skysongClaims.ownership;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.limit.LimitRules;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.RefusedException;

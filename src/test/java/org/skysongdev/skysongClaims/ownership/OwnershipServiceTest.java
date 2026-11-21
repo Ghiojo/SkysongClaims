@@ -2,16 +2,17 @@ package org.skysongdev.skysongClaims.ownership;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimGroup;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
+import org.skysongdev.skysongClaims.api.GroupPermission;
+import org.skysongdev.skysongClaims.api.OwnerCause;
+import org.skysongdev.skysongClaims.api.OwnershipCheck;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimGroup;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.ClaimState;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
-import org.skysongdev.skysongClaims.claim.GroupPermission;
 import org.skysongdev.skysongClaims.claim.InMemoryClaimRepository;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.limit.LimitRules;
 import org.skysongdev.skysongClaims.limit.Limits;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
@@ -142,5 +143,16 @@ class OwnershipServiceTest {
         rules.unregisterAll("Ranks");
 
         assertEquals(2, ownership.ownedBy(alice).size());
+    }
+
+    @Test
+    void aGroupMemberWhoBecomesAnOwnerLeavesTheGroup() {
+        Claim taken = ownership.take(alice, "hovel_1");
+        store.save(taken.withGroups(List.of(new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(bob, carol)))),
+                ChangeCause.COMMAND);
+
+        Claim shared = ownership.take(bob, "hovel_1");
+
+        assertEquals(Set.of(carol), shared.groups().getFirst().members());
     }
 }

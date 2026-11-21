@@ -1,5 +1,7 @@
 package org.skysongdev.skysongClaims.sign;
 
+import org.skysongdev.skysongClaims.api.MenuButton;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

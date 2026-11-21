@@ -1,6 +1,7 @@
 package org.skysongdev.skysongClaims.claim;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 

@@ -1,5 +1,8 @@
 package org.skysongdev.skysongClaims.type;
 
+import org.skysongdev.skysongClaims.api.ClaimTypeInfo;
+import org.skysongdev.skysongClaims.api.LimitScope;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +44,11 @@ public record ClaimType(
         }
         openUse = List.copyOf(openUse);
         extra = Map.copyOf(extra);
+    }
+
+    /** @return what the API shows of it: everything but its open-use flags */
+    public ClaimTypeInfo info() {
+        return new ClaimTypeInfo(id, displayName, limit, limitScope, maxOwners, freeClaim, extra);
     }
 
     /** @return the number of owners a new Free Claim of this type has room for, empty when it isn't a Free Claim type */

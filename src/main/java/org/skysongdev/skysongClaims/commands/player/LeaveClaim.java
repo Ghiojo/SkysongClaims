@@ -40,7 +40,7 @@ final class LeaveClaim extends LeafCommand {
                     unparsed("claim", claim.id()), parsed("name", claim.displayName()));
             return;
         }
-        support.ownership().removeOwner(claim.id(), character, ChangeCause.COMMAND);
+        support.ownership().removeOwner(claim.id(), character, ChangeCause.LEAVE);
         messenger.send(sender, "player.left", unparsed("claim", claim.id()), parsed("name", claim.displayName()));
     }
 

@@ -12,7 +12,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 
 import java.util.ArrayList;
 import java.util.Comparator;

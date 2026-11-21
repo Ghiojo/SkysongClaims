@@ -65,4 +65,25 @@ public interface SkysongClaimsApi {
      * @return the API version, for example {@code "1.0.0"}
      */
     @NotNull String apiVersion();
+
+    /** @return reading Claims */
+    @NotNull Claims claims();
+
+    /** @return reading Claim types */
+    @NotNull ClaimTypes types();
+
+    /** @return owners: adding, removing and transferring them */
+    @NotNull Ownership ownership();
+
+    /** @return whether Claims are for sale */
+    @NotNull Market market();
+
+    /** @return reading owners' build groups */
+    @NotNull Groups groups();
+
+    /** @return ownership limits and the live rules that raise them */
+    @NotNull Limits limits();
+
+    /** @return Claim signs: the price line and menu buttons */
+    @NotNull ClaimSigns signs();
 }

@@ -1,10 +1,9 @@
 package org.skysongdev.skysongClaims.support;
 
 import org.bukkit.Location;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
-import org.skysongdev.skysongClaims.worldguard.RegionGateway;
-
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.worldguard.RegionAccess;
+import org.skysongdev.skysongClaims.worldguard.RegionGateway;
 
 import java.util.HashMap;
 import java.util.HashSet;

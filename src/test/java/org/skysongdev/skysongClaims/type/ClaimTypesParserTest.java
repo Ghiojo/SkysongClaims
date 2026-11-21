@@ -1,6 +1,7 @@
 package org.skysongdev.skysongClaims.type;
 
 import org.junit.jupiter.api.Test;
+import org.skysongdev.skysongClaims.api.LimitScope;
 import org.skysongdev.skysongClaims.config.ConfigException;
 import org.skysongdev.skysongClaims.config.ConfigSection;
 import org.skysongdev.skysongClaims.config.YamlFiles;

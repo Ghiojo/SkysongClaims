@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ApiRegistrationTest {
     private ServicesManager services;
     private Plugin plugin;
-    private final SkysongClaimsApi api = new SkysongClaimsApiImpl();
+    private final SkysongClaimsApi api = new ApiFixture().api;
 
     @BeforeEach
     void setUp() {

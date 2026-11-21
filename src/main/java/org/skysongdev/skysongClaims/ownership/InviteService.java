@@ -1,9 +1,10 @@
 package org.skysongdev.skysongClaims.ownership;
 
+import org.skysongdev.skysongClaims.api.OwnerCause;
+import org.skysongdev.skysongClaims.api.OwnershipCheck;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
 import org.skysongdev.skysongClaims.claim.Claim;
 import org.skysongdev.skysongClaims.claim.ClaimStore;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.messaging.RefusedException;
 import org.skysongdev.skysongstats.api.CharacterId;
 
@@ -52,8 +53,7 @@ public final class InviteService {
         }
         OwnershipCheck check = ownership.canOwn(invitee, claim);
         if (check != OwnershipCheck.OK) {
-            throw RefusedException.of(check.messageKey(), "claim", claim.id(), "character", invitee.profile(),
-                    "type", claim.typeId());
+            throw OwnershipService.refusal(check, claim, invitee);
         }
         dropExpired();
         invites.removeIf(invite -> invite.invitee().equals(invitee) && invite.claimId().equals(claim.id()));

@@ -1,8 +1,8 @@
 package org.skysongdev.skysongClaims.commands.staff;
 
 import org.bukkit.command.CommandSender;
+import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.api.event.ChangeCause;
-import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongClaims.commands.ClaimArguments;
 import org.skysongdev.skysongClaims.commands.LeafCommand;
 import org.skysongdev.skysongClaims.ownership.OwnershipService;

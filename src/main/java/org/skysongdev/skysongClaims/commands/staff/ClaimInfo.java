@@ -1,9 +1,9 @@
 package org.skysongdev.skysongClaims.commands.staff;
 
 import org.bukkit.command.CommandSender;
+import org.skysongdev.skysongClaims.api.ClaimOwner;
+import org.skysongdev.skysongClaims.api.ClaimRegion;
 import org.skysongdev.skysongClaims.claim.Claim;
-import org.skysongdev.skysongClaims.claim.ClaimOwner;
-import org.skysongdev.skysongClaims.claim.ClaimRegion;
 import org.skysongdev.skysongClaims.commands.ClaimArguments;
 import org.skysongdev.skysongClaims.commands.LeafCommand;
 import org.skysongdev.skysongClaims.type.ClaimType;
