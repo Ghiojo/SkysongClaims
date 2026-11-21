@@ -1,5 +1,6 @@
 package org.skysongdev.skysongClaims.ownership;
 
+import org.skysongdev.skysongClaims.api.ClaimGroup;
 import org.skysongdev.skysongClaims.api.ClaimOwner;
 import org.skysongdev.skysongClaims.api.OwnerCause;
 import org.skysongdev.skysongClaims.api.OwnershipCheck;
@@ -127,8 +128,7 @@ public final class OwnershipService {
         List<ClaimOwner> owners = claim.owners().stream()
                 .map(owner -> owner.character().equals(from) ? new ClaimOwner(to, clock.instant(), how) : owner)
                 .toList();
-        Claim changed = claim.withOwners(owners)
-                .withGroups(claim.groups().stream().map(group -> group.withoutMember(to)).toList());
+        Claim changed = claim.withOwners(owners).withGroups(withoutMember(claim, to));
         store.save(changed, cause);
         return changed;
     }
@@ -138,6 +138,10 @@ public final class OwnershipService {
         Claim changed = store.require(claimId).withOwners(List.of()).withGroups(List.of());
         store.save(changed, cause);
         return changed;
+    }
+
+    private static List<ClaimGroup> withoutMember(Claim claim, CharacterId character) {
+        return claim.groups().stream().map(group -> group.withoutMember(character)).toList();
     }
 
     private static List<ClaimOwner> withoutOwner(Claim claim, CharacterId character) {
@@ -156,7 +160,8 @@ public final class OwnershipService {
         }
         List<ClaimOwner> owners = new ArrayList<>(claim.owners());
         owners.add(new ClaimOwner(character, clock.instant(), how));
-        Claim changed = claim.withOwners(owners);
+        // Owners build already, so they are never also group members.
+        Claim changed = claim.withOwners(owners).withGroups(withoutMember(claim, character));
         store.save(changed, cause);
         return changed;
     }

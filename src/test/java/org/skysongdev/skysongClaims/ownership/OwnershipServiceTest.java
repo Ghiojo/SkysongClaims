@@ -144,4 +144,15 @@ class OwnershipServiceTest {
 
         assertEquals(2, ownership.ownedBy(alice).size());
     }
+
+    @Test
+    void aGroupMemberWhoBecomesAnOwnerLeavesTheGroup() {
+        Claim taken = ownership.take(alice, "hovel_1");
+        store.save(taken.withGroups(List.of(new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(bob, carol)))),
+                ChangeCause.COMMAND);
+
+        Claim shared = ownership.take(bob, "hovel_1");
+
+        assertEquals(Set.of(carol), shared.groups().getFirst().members());
+    }
 }
