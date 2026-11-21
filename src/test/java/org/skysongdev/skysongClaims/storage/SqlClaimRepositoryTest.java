@@ -12,6 +12,7 @@ import org.skysongdev.skysongClaims.claim.OwnerCause;
 import org.skysongdev.skysongstats.api.CharacterId;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +45,7 @@ class SqlClaimRepositoryTest {
                         new ClaimOwner(BOB, Instant.ofEpochMilli(2000), OwnerCause.FREE_CLAIM),
                         new ClaimOwner(ALICE, Instant.ofEpochMilli(1000), OwnerCause.INVITE)))
                 .withGroups(List.of(
-                        new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), Set.of(BOB, ALICE)),
+                        new ClaimGroup("family", "Family", Set.of(GroupPermission.BUILD), new LinkedHashSet<>(List.of(BOB, ALICE))),
                         new ClaimGroup("guests", "Guests", Set.of(), Set.of())))
                 .withSale(Optional.of("SkysongEconomy"));
     }
